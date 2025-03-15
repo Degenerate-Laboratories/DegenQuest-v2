@@ -15,10 +15,14 @@ node_modules/
 # Next.js
 /.next/
 /out/
+**/apps/*/.next/
+**/.next/
 
 # Production
 /build
 /dist
+**/build/
+**/dist/
 
 # Misc
 .DS_Store
@@ -44,6 +48,8 @@ next-env.d.ts
 # Cache
 .cache/
 .npm/
+.turbo/
+**/.turbo/
 
 # Game specific
 database.db
