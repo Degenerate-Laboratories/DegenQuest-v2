@@ -1,20 +1,24 @@
 {
-  "name": "degenquest-v2",
-  "version": "1.0.0",
-  "description": "Brave the Abyss—Fortunes Minted by the Bold.",
-  "main": "index.js",
+  "name": "degenquest",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "check-types": "turbo run check-types"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Degenerate-Laboratories/DegenQuest-v2.git"
+  "devDependencies": {
+    "prettier": "^3.5.3",
+    "turbo": "^2.4.4",
+    "typescript": "5.8.2"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Degenerate-Laboratories/DegenQuest-v2/issues"
+  "packageManager": "pnpm@9.0.0",
+  "engines": {
+    "node": ">=18"
   },
-  "homepage": "https://github.com/Degenerate-Laboratories/DegenQuest-v2#readme"
+  "dependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  }
 }
