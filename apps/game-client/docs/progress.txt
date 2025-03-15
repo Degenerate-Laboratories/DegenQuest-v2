@@ -1,0 +1,41 @@
+# Progress Tracker
+
+## First-Person Controls Implementation
+
+### Completed:
+
+#### Mouse Look System
+- ✅ Implemented proper first-person mouse look without right-click requirement
+- ✅ Added mouse sensitivity adjustment with dynamic scaling
+- ✅ Fixed rubber-banding issue by properly resetting movement values
+- ✅ Added pointer lock support with proper user notifications
+- ✅ Ensured proper updating of rotation values for both camera and player entity
+
+#### WASD Movement System 
+- ✅ Fixed inverted W/S controls to match expected first-person behavior
+- ✅ Fixed inverted A/D controls for proper strafing relative to player orientation
+- ✅ Improved movement stopping to eliminate lag/delay when keys are released
+- ✅ Added robust debug logging for movement calculations
+- ✅ Ensured server is notified immediately of movement state changes
+
+#### Documentation
+- ✅ Created troubleshooting guide for first-person controls
+- ✅ Documented movement calculations and debugging techniques
+
+### In Progress:
+
+- 🔄 Fine-tuning mouse sensitivity values
+- 🔄 Watching for any remaining movement/orientation bugs
+
+### Planned:
+
+- 📋 Add UI element to adjust mouse sensitivity
+- 📋 Add options for inverting vertical look
+- 📋 Consider adding sprint functionality (shift key)
+- 📋 Implement proper camera bobbing for more immersive walking
+- 📋 Add optional auto-run toggle (like MMOs)
+
+## Known Issues:
+
+- ⚠️ Mouse sometimes needs multiple clicks to lock in some browsers
+- ⚠️ Need to verify WASD movement calculations work in all camera orientations 
