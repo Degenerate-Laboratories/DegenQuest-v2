@@ -6,11 +6,13 @@ import { ServerMsg } from "../../shared/types";
 export class Network {
     public _client: Client;
     public connectionSuccessful: boolean = false;
+    public serverUrl: string = "";
 
     constructor(port = 3000) {
         try {
             // Use localhost WebSocket URL
             const url = "ws://localhost:" + port;
+            this.serverUrl = url;
             
             console.log("%c[Network] Connecting to game server: " + url, "color: green; font-weight: bold");
             
@@ -21,10 +23,37 @@ export class Network {
             console.log("%c[Network] Client created with debug enabled", "color: blue");
             console.log("%c[Network] Matchmaking endpoint is /matchmake", "color: blue");
             
+            // Display connection info in game
+            this.displayConnectionInfo(url);
+            
             // Test the connection by creating an actual game room
             this.createTestRoom();
         } catch (error) {
             console.error("%c[Network] Failed to initialize client:", "color: red; font-weight: bold", error);
+        }
+    }
+
+    private displayConnectionInfo(url: string) {
+        // Create debug overlay element
+        const debugInfo = document.createElement('div');
+        debugInfo.style.position = 'fixed';
+        debugInfo.style.bottom = '10px';
+        debugInfo.style.left = '10px';
+        debugInfo.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+        debugInfo.style.color = '#00ff00';
+        debugInfo.style.padding = '5px 10px';
+        debugInfo.style.fontFamily = 'monospace';
+        debugInfo.style.fontSize = '12px';
+        debugInfo.style.zIndex = '9999';
+        debugInfo.textContent = `Server: ${url}`;
+        
+        // Add to document when DOM is loaded
+        if (document.body) {
+            document.body.appendChild(debugInfo);
+        } else {
+            window.addEventListener('DOMContentLoaded', () => {
+                document.body.appendChild(debugInfo);
+            });
         }
     }
     

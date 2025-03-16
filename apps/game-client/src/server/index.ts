@@ -5,7 +5,8 @@ import cors from "cors";
 
 import { Server, matchMaker } from "@colyseus/core";
 import { monitor } from "@colyseus/monitor";
-import { playground } from "@colyseus/playground";
+// Comment out playground import to fix Docker build
+// import { playground } from "@colyseus/playground";
 
 import { WebSocketTransport } from "@colyseus/ws-transport";
 import { GameRoom } from "./rooms/GameRoom";
@@ -80,10 +81,8 @@ class GameServer {
 
         // start dev routes
         if (process.env.NODE_ENV !== "production") {
-
-
-            // bind it as an express middleware
-            app.use("/playground", playground);
+            // Comment out playground to fix Docker build
+            // app.use("/playground", playground);
         }
 
         //////////////////////////////////////////////////

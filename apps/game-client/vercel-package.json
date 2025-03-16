@@ -1,0 +1,38 @@
+{
+  "name": "degenquest-client",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build": "webpack --config webpack.prod.js",
+    "dev": "webpack serve --open --config webpack.dev.js"
+  },
+  "dependencies": {
+    "@babylonjs/core": "7.32.3",
+    "@babylonjs/gui": "7.32.3",
+    "@babylonjs/loaders": "7.32.3",
+    "@babylonjs/serializers": "7.32.3",
+    "babylonjs-gltf2interface": "7.32.3",
+    "colyseus.js": "^0.15.19"
+  },
+  "devDependencies": {
+    "@babylonjs/inspector": "7.32.3",
+    "@types/node": "^20.12.12",
+    "copy-webpack-plugin": "^12.0.2",
+    "ts-loader": "^9.5.1",
+    "typescript": "^5.4.5",
+    "webpack": "^5.92.0",
+    "webpack-cli": "^5.1.4",
+    "webpack-dev-server": "^5.0.4",
+    "webpack-merge": "^5.10.0"
+  },
+  "browserslist": {
+    "production": [
+      "> 5%"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+} 
