@@ -40,7 +40,7 @@ class Config {
     SHADOW_ON = true;
 
     // default location
-    initialLocation = "lh_town";
+    initialLocation = "flat_battlefield";
 }
 
 export { Config };

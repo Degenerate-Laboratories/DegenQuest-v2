@@ -155,7 +155,7 @@ class Database {
                 20,
                 20,
                 //"training_ground",
-                "lh_town",
+                "flat_battlefield",
 
                 6.18,
                 0.1,

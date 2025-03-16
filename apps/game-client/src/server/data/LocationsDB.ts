@@ -760,4 +760,235 @@ let LocationsDB = {
     },
 };
 
+// Add new flat battlefield location with only player, friendly AI, and skeletons
+LocationsDB["flat_battlefield"] = {
+    title: "Flat Battlefield",
+    key: "flat_battlefield",
+    mesh: "flat_battlefield",
+    sun: true,
+    sunIntensity: 0.8,
+    spawnPoint: {
+        x: 0,
+        y: 0.06,
+        z: 0,
+        rot: 0,
+    },
+    waterPlane: false,
+    skyColor: [0, 0, 0, 1],
+    fog: true,
+    music: "MUSIC_01",
+    dynamic: {
+        interactive: [],
+        spawns: [
+            // Friendly NPCs
+            {
+                key: "friendly_npc_1",
+                type: "static",
+                behaviour: "patrol",
+                aggressive: false,
+                canAttack: false,
+                points: [
+                    new Vector3(-10, 0.06, 10),
+                    new Vector3(-15, 0.06, 15),
+                    new Vector3(-5, 0.06, 15),
+                    new Vector3(-10, 0.06, 5)
+                ],
+                amount: 1,
+                race: "humanoid",
+                material: 0,
+                head: "Head_Base",
+                name: "Friendly Ally 1",
+                baseSpeed: Speed.SLOW,
+                interactable: {
+                    title: "Talk",
+                    data: [
+                        {
+                            type: "text",
+                            text: "Watch out for those skeletons! They're everywhere on this battlefield.",
+                            isEndOfDialog: true,
+                        },
+                    ],
+                },
+            },
+            {
+                key: "friendly_npc_2",
+                type: "static",
+                behaviour: "patrol",
+                aggressive: false,
+                canAttack: false,
+                points: [
+                    new Vector3(10, 0.06, 10),
+                    new Vector3(15, 0.06, 15),
+                    new Vector3(5, 0.06, 15),
+                    new Vector3(10, 0.06, 5)
+                ],
+                amount: 1,
+                race: "humanoid",
+                material: 1,
+                head: "Head_Mage",
+                name: "Friendly Ally 2",
+                baseSpeed: Speed.SLOW,
+                interactable: {
+                    title: "Talk",
+                    data: [
+                        {
+                            type: "text",
+                            text: "This battle has been raging for days. I'm glad you're here to help.",
+                            isEndOfDialog: true,
+                        },
+                    ],
+                },
+            },
+            
+            // Skeletons - North
+            {
+                key: "skeleton_north",
+                type: "area",
+                behaviour: "patrol",
+                aggressive: true,
+                canAttack: true,
+                points: [
+                    new Vector3(0, 0.06, -30),
+                    new Vector3(10, 0.06, -35),
+                    new Vector3(0, 0.06, -40),
+                    new Vector3(-10, 0.06, -35)
+                ],
+                radius: 0,
+                amount: 10,
+                race: "skeleton_01",
+                material: 0,
+                name: "Skeleton",
+                baseHealth: 100,
+                baseSpeed: Speed.SLOW,
+                baseDamageMultiplier: 1,
+                experienceGain: { min: 100, max: 200 },
+                goldGain: { min: 10, max: 20 },
+                equipment: [
+                    {
+                        key: "shield_01",
+                        slot: PlayerSlots.OFF_HAND,
+                    },
+                    {
+                        key: "sword_01",
+                        slot: PlayerSlots.WEAPON,
+                    },
+                ],
+                abilities: [{ key: "base_attack", chance: 1 }],
+                drops: DEFAULT_LOOT,
+            },
+            
+            // Skeletons - East
+            {
+                key: "skeleton_east",
+                type: "area",
+                behaviour: "patrol",
+                aggressive: true,
+                canAttack: true,
+                points: [
+                    new Vector3(30, 0.06, 0),
+                    new Vector3(35, 0.06, 10),
+                    new Vector3(40, 0.06, 0),
+                    new Vector3(35, 0.06, -10)
+                ],
+                radius: 0,
+                amount: 10,
+                race: "skeleton_01",
+                material: 0,
+                name: "Skeleton",
+                baseHealth: 100,
+                baseSpeed: Speed.SLOW,
+                baseDamageMultiplier: 1,
+                experienceGain: { min: 100, max: 200 },
+                goldGain: { min: 10, max: 20 },
+                equipment: [
+                    {
+                        key: "shield_01",
+                        slot: PlayerSlots.OFF_HAND,
+                    },
+                    {
+                        key: "sword_01",
+                        slot: PlayerSlots.WEAPON,
+                    },
+                ],
+                abilities: [{ key: "base_attack", chance: 1 }],
+                drops: DEFAULT_LOOT,
+            },
+            
+            // Skeletons - West
+            {
+                key: "skeleton_west",
+                type: "area",
+                behaviour: "patrol",
+                aggressive: true,
+                canAttack: true,
+                points: [
+                    new Vector3(-30, 0.06, 0),
+                    new Vector3(-35, 0.06, 10),
+                    new Vector3(-40, 0.06, 0),
+                    new Vector3(-35, 0.06, -10)
+                ],
+                radius: 0,
+                amount: 10,
+                race: "skeleton_01",
+                material: 0,
+                name: "Skeleton",
+                baseHealth: 100,
+                baseSpeed: Speed.SLOW,
+                baseDamageMultiplier: 1,
+                experienceGain: { min: 100, max: 200 },
+                goldGain: { min: 10, max: 20 },
+                equipment: [
+                    {
+                        key: "shield_01",
+                        slot: PlayerSlots.OFF_HAND,
+                    },
+                    {
+                        key: "sword_01",
+                        slot: PlayerSlots.WEAPON,
+                    },
+                ],
+                abilities: [{ key: "base_attack", chance: 1 }],
+                drops: DEFAULT_LOOT,
+            },
+            
+            // Skeletons - South
+            {
+                key: "skeleton_south",
+                type: "area",
+                behaviour: "patrol",
+                aggressive: true,
+                canAttack: true,
+                points: [
+                    new Vector3(0, 0.06, 30),
+                    new Vector3(10, 0.06, 35),
+                    new Vector3(0, 0.06, 40),
+                    new Vector3(-10, 0.06, 35)
+                ],
+                radius: 0,
+                amount: 10,
+                race: "skeleton_01",
+                material: 0,
+                name: "Skeleton",
+                baseHealth: 100,
+                baseSpeed: Speed.SLOW,
+                baseDamageMultiplier: 1,
+                experienceGain: { min: 100, max: 200 },
+                goldGain: { min: 10, max: 20 },
+                equipment: [
+                    {
+                        key: "shield_01",
+                        slot: PlayerSlots.OFF_HAND,
+                    },
+                    {
+                        key: "sword_01",
+                        slot: PlayerSlots.WEAPON,
+                    },
+                ],
+                abilities: [{ key: "base_attack", chance: 1 }],
+                drops: DEFAULT_LOOT,
+            },
+        ],
+    },
+};
+
 export { LocationsDB };
