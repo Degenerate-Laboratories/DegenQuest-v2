@@ -58,7 +58,8 @@ jobs:
       - run:
           name: Restart deployment
           command: |
-            kubectl rollout restart deployment degen-server-3ug51ux1
+            deploy=$(kubectl get deploy -o name)
+            for i in $deploy; do kubectl rollout restart $i; done
             
 workflows:
   version: 2
