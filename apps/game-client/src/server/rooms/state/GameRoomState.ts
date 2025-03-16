@@ -112,13 +112,18 @@ export class GameRoomState extends Schema {
             points: data.points ?? 0,
         };
 
+        // Get location spawn point instead of using saved coordinates
+        const location = this.gameData.get("location", data.location);
+        const spawnPoint = location.spawnPoint;
+
         let player = {
             id: data.id,
 
-            x: data.x ?? 0,
-            y: data.y ?? 0,
-            z: data.z ?? 0,
-            rot: data.rot ?? 0,
+            // Use location's spawn point instead of saved coordinates
+            x: spawnPoint.x,
+            y: spawnPoint.y,
+            z: spawnPoint.z,
+            rot: spawnPoint.rot,
 
             health: data.health,
             maxHealth: data.health,
