@@ -52,9 +52,25 @@ jobs:
             doctl auth init -t $DIGITALOCEAN_ACCESS_TOKEN
             doctl kubernetes cluster kubeconfig save do-cluster-2b9226d
       - run:
-          name: Apply PVC if not exists
+          name: Handle PVC (check first, create only if missing)
           command: |
-            kubectl apply -f k8s/db-pvc.yaml
+            if kubectl get pvc degen-server-db-pvc &> /dev/null; then
+              echo "PVC degen-server-db-pvc already exists, skipping creation"
+            else
+              echo "Creating new PVC degen-server-db-pvc"
+              kubectl apply -f k8s/db-pvc.yaml
+            fi
+      - run:
+          name: Update storageClassName only if it's missing
+          command: |
+            # Check if storageClassName is set in the PVC
+            SC=$(kubectl get pvc degen-server-db-pvc -o jsonpath='{.spec.storageClassName}')
+            if [ -z "$SC" ]; then
+              echo "Setting storageClassName to do-block-storage"
+              kubectl patch pvc degen-server-db-pvc -p '{"spec":{"storageClassName":"do-block-storage"}}'
+            else
+              echo "storageClassName is already set to: $SC"
+            fi
       - run:
           name: Restart deployment
           command: |

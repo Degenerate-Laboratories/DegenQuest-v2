@@ -56,3 +56,55 @@ html{
     transform: translateY(-50%);
     width: 100%;
   }
+
+/* Debug Overlay */
+#debugOverlay {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    background-color: rgba(0, 0, 0, 0.7);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1000;
+    max-width: 80%;
+    max-height: 80%;
+    overflow: auto;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+#debugOverlay.error {
+    background-color: rgba(255, 0, 0, 0.7);
+}
+
+#debugOverlay.success {
+    background-color: rgba(0, 128, 0, 0.7);
+}
+
+.debugLine {
+    margin: 5px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 5px;
+}
+
+.debugButton {
+    background-color: #4CAF50;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 3px;
+}
+
+.debugButton.warning {
+    background-color: #ff9800;
+}
+
+.debugButton.error {
+    background-color: #f44336;
+}

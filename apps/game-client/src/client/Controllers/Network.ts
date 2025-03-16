@@ -5,21 +5,70 @@ import { ServerMsg } from "../../shared/types";
 
 export class Network {
     public _client: Client;
+    public connectionSuccessful: boolean = false;
 
-    constructor(port) {
-        // create colyseus client
-        let url = "wss://" + window.location.hostname;
-        if (isLocal()) {
-            url = "ws://localhost:" + port;
+    constructor(port = 3000) {
+        try {
+            // Use localhost WebSocket URL
+            const url = "ws://localhost:" + port;
+            
+            console.log("%c[Network] Connecting to game server: " + url, "color: green; font-weight: bold");
+            
+            // Add WebSocket debugging
+            this._client = new Client(url);
+            
+            // Enable debug logging
+            console.log("%c[Network] Client created with debug enabled", "color: blue");
+            console.log("%c[Network] Matchmaking endpoint is /matchmake", "color: blue");
+            
+            // Test the connection by creating an actual game room
+            this.createTestRoom();
+        } catch (error) {
+            console.error("%c[Network] Failed to initialize client:", "color: red; font-weight: bold", error);
         }
-        this._client = new Client(url);
+    }
+    
+    private async createTestRoom() {
+        try {
+            // Get available rooms to verify connection
+            console.log("%c[Network] Testing connection by creating a test room...", "color: yellow; font-weight: bold");
+            
+            // Create a test token and character ID
+            const testToken = "test_token_" + Date.now();
+            const testCharacterId = 1; // Use character ID 1 for testing
+            
+            // Use a valid location name and include required parameters
+            const room = await this._client.create("game_room", { 
+                location: "lh_town", // Valid location with existing navmesh file
+                token: testToken,
+                character_id: testCharacterId
+            });
+            
+            console.log("%c[Network] TEST SUCCESSFUL! Room created with ID:", "color: green; font-weight: bold", room.id);
+            console.log("%c[Network] Connection to game server is FULLY OPERATIONAL!", "color: green; font-weight: bold");
+            
+            // Clean up by leaving the test room
+            room.leave();
+            this.connectionSuccessful = true;
+        } catch (error) {
+            console.error("%c[Network] Room creation test failed:", "color: red; font-weight: bold", error);
+            console.error("%c[Network] Error details:", "color: red", error);
+        }
     }
 
     public async joinRoom(roomId, token, character_id): Promise<any> {
-        return await this._client.joinById(roomId, {
-            token: token,
-            character_id: character_id,
-        });
+        try {
+            console.log(`%c[Network] Attempting to join room: ${roomId}`, "color: yellow");
+            const room = await this._client.joinById(roomId, {
+                token: token,
+                character_id: character_id,
+            });
+            console.log(`%c[Network] Successfully joined room: ${roomId}`, "color: green");
+            return room;
+        } catch (error) {
+            console.error(`%c[Network] Failed to join room: ${roomId}`, "color: red", error);
+            throw error;
+        }
     }
 
     public async joinChatRoom(data): Promise<any> {

@@ -12,17 +12,32 @@ import { GameScene } from "../Screens/GameScene";
 import { GameIntegrator } from "../FPS/GameIntegrator";
 
 export class GameController {
-    // core
-    public engine;
-    public scene;
-    public client: Network;
+    // scene properties
+    public scene: any;
+    public assets: any;
+    public engine: any;
     public config: Config;
-
-    // scene management
-    public state: number = 0;
-    public currentScene;
-    public nextScene;
+    public characters: any[];
+    public currentScene: any;
+    public state: number;
+    public nextScene: number;
     public gamescene: GameScene;
+    
+    // player properties
+    public username: string;
+    public password: string;
+    public activeCharacter: any;
+    public character_name: string | null;
+    public avatarAssetId: string | null;
+    
+    // Network properties
+    public client: Network;
+    
+    // Core app reference
+    private _app: any;
+    
+    // FPS mode
+    private _fpsIntegrator: GameIntegrator | null = null;
 
     // all user data
     public currentSessionID: string;
@@ -62,17 +77,28 @@ export class GameController {
         help: [],
     };
 
-    // Add property to the class
-    private _fpsIntegrator: GameIntegrator | null = null;
-
     constructor(app) {
+        this._app = app;
+        this.username = localStorage.getItem("username") || "";
+        this.password = localStorage.getItem("password") || "";
+
+        // initialize constants
+        this.activeCharacter = null;
+        this.character_name = null;
+        this.avatarAssetId = null;
+        
+        this.config = new Config();
+
+        // game state management
+        this.state = 0;
+        this.nextScene = 0;
+
         // core
         this.engine = app.engine;
-        this.config = app.config;
         this.scene = app.scene;
 
         // create colyseus client
-        this.client = new Network(app.config.port);
+        this.client = new Network(this.config.port);
 
         // check if on mobile
         if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)) {

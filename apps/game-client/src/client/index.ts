@@ -50,57 +50,83 @@ class App {
     public game: GameController;
 
     constructor() {
+        console.log("%c[App] Starting DegenQuest initialization...", "color: green; font-weight: bold");
+        
         // create canvas
         this.canvas = document.getElementById("renderCanvas");
+        if (!this.canvas) {
+            console.error("%c[App] Failed to find renderCanvas element!", "color: red; font-weight: bold");
+            return;
+        }
+        console.log("%c[App] Canvas found", "color: green");
 
         // set config
         this.config = new Config();
+        console.log("%c[App] Config initialized", "color: green");
 
         // initialize babylon scene and engine
         this._init();
     }
 
     private async _init(): Promise<void> {
-        // create engine
-        this.engine = new Engine(this.canvas, true, {
-            adaptToDeviceRatio: true,
-            antialias: true,
-        });
+        try {
+            console.log("%c[App] Creating engine...", "color: blue");
+            // create engine
+            this.engine = new Engine(this.canvas, true, {
+                adaptToDeviceRatio: true,
+                antialias: true,
+            });
+            console.log("%c[App] Engine created", "color: green");
 
-        //
-        this.engine.setHardwareScalingLevel(1);
+            //
+            this.engine.setHardwareScalingLevel(1);
 
-        // loading
-        var loadingScreen = new Loading("Loading Assets...");
-        this.engine.loadingScreen = loadingScreen;
+            // loading
+            console.log("%c[App] Setting up loading screen...", "color: blue");
+            var loadingScreen = new Loading("Loading Assets...");
+            this.engine.loadingScreen = loadingScreen;
+            console.log("%c[App] Loading screen created", "color: green");
 
-        // preload game data
-        this.game = new GameController(this);
-        await this.game.initializeGameData();
+            // preload game data
+            console.log("%c[App] Initializing GameController...", "color: blue");
+            this.game = new GameController(this);
+            console.log("%c[App] Initializing game data...", "color: blue");
+            await this.game.initializeGameData();
+            console.log("%c[App] Game data initialized", "color: green");
 
-        // set default scene
-        let defaultScene = isLocal() ? State.GAME : State.LOGIN;
-        this.game.setScene(defaultScene);
+            // set default scene
+            console.log("%c[App] Setting default scene...", "color: blue");
+            let defaultScene = isLocal() ? State.GAME : State.LOGIN;
+            console.log("%c[App] Default scene selected:", "color: green", defaultScene === State.GAME ? "GAME" : "LOGIN");
+            this.game.setScene(defaultScene);
 
-        // main render loop & state machine
-        await this._render();
+            // main render loop & state machine
+            console.log("%c[App] Starting render loop...", "color: blue");
+            await this._render();
+            console.log("%c[App] Render loop started", "color: green");
 
-        // Add global F key handler
-        window.addEventListener("keydown", (evt) => {
-            if (evt.code === "KeyF" && !evt.repeat) {
-                console.log("Global F key handler - toggling FPS mode");
-                if (this.game.toggleFPSMode) {
-                    this.game.toggleFPSMode();
+            // Add global F key handler
+            window.addEventListener("keydown", (evt) => {
+                if (evt.code === "KeyF" && !evt.repeat) {
+                    console.log("Global F key handler - toggling FPS mode");
+                    if (this.game.toggleFPSMode) {
+                        this.game.toggleFPSMode();
+                    }
                 }
-            }
-        });
+            });
+        } catch (error) {
+            console.error("%c[App] Error during initialization:", "color: red; font-weight: bold", error);
+        }
     }
 
     private async _render(): Promise<void> {
         // render loop
         this.engine.runRenderLoop(() => {
             // monitor state
-            this.game.state = this.checkForSceneChange();
+            const sceneChange = this.checkForSceneChange();
+            if (sceneChange !== undefined) {
+                this.game.state = sceneChange;
+            }
 
             switch (this.game.state) {
                 ///////////////////////////////////////
