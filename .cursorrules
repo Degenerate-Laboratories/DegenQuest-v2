@@ -1,0 +1,10 @@
+# DEGENQUEST SERVER RULES
+
+## MOST IMPORTANT RULE
+- ALWAYS kill all Node processes before starting server or client
+- This prevents port conflicts and stale processes
+
+## Server Commands
+1. Kill all processes: taskkill /F /IM node.exe
+2. Start server: cd apps/game-client; npm run server-dev
+3. Start client: cd apps/game-client; npm run client-dev
