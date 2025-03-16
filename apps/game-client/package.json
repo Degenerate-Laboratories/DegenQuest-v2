@@ -14,7 +14,12 @@
         "server-dev": "ts-node-dev --respawn --inspect --transpile-only src/server/index.ts",
         "server-start": "ts-node --transpile-only src/server/index.ts",
         "server-build": "tsc && cp -r public dist",
-        "loadtest": "npx tsx loadtest/test.ts --room game_room --numClients 10 --endpoint ws://localhost:3000"
+        "loadtest": "npx tsx loadtest/test.ts --room game_room --numClients 10 --endpoint ws://localhost:3000",
+        "docker:build": "docker build -t degen-server -f Dockerfile ../../",
+        "docker:tag": "docker tag degen-server:latest registry.digitalocean.com/pioneer/degen-server:latest",
+        "docker:run": "docker run --env-file=../../.env degen-server:latest",
+        "docker:push": "docker push registry.digitalocean.com/pioneer/degen-server:latest",
+        "docker:push:all": "npm run docker:build && npm run docker:tag && npm run docker:push"
     },
     "author": "Orion3d",
     "license": "MIT",
@@ -28,6 +33,7 @@
         "@colyseus/schema": "^2.0.32",
         "@colyseus/ws-transport": "^0.15.2",
         "@types/node": "^20.12.12",
+        "@types/qs": "^6.9.12",
         "@types/react": "^18.3.2",
         "@types/react-dom": "^18.3.0",
         "axios": "^1.7.1",
@@ -57,6 +63,7 @@
         "fs-extra": "^11.2.0",
         "mysql2": "^3.10.2",
         "nanoid": "^3.0.0",
+        "qs": "^6.12.0",
         "sqlite3": "^5.1.7",
         "winston": "^3.13.0"
     },

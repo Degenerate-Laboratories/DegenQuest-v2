@@ -15,7 +15,11 @@
         "baseUrl": ".",
         "paths": {
             "@shared/*": ["../shared/*"]
-        }
+        },
+        "skipLibCheck": true,
+        "noImplicitAny": false,
+        "strictPropertyInitialization": false,
+        "strictNullChecks": false
     },
     "include": ["src/server/*", "src/**/*.d.ts", "src/shared/**/*.ts", "src/shared/**/*.js"],
     "exclude": ["node_modules", "**/*.spec.js"]
