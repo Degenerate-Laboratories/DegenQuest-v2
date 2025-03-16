@@ -65,7 +65,7 @@ class GameServer {
         // listen
         gameServer.listen(port).then(() => {
             // server is now running
-            Logger.info("[gameserver] listening on http://localhost:" + port);
+            Logger.info("[gameserver] listening on http://0.0.0.0:" + port);
 
             // create town room
             //matchMaker.createRoom("game_room", { location: "lh_town" });
