@@ -104,6 +104,13 @@ class Database {
 
     async getCharacter(id: number) {
         let character = await this.querier.get(`SELECT * FROM characters WHERE id=?;`, [id]);
+        
+        // Check if character exists before proceeding
+        if (!character) {
+            Logger.warning(`[database] Character with id ${id} not found in database`);
+            return null;
+        }
+        
         character.abilities = await this.querier.all(`SELECT CA.* FROM character_abilities CA WHERE CA.owner_id=? ORDER BY CA.id ASC;`, [id]);
         character.hotbar = await this.querier.all(`SELECT CA.* FROM character_hotbar CA WHERE CA.owner_id=? ORDER BY CA.digit ASC;`, [id]);
         character.inventory = await this.querier.all(`SELECT CI.* FROM character_inventory CI WHERE CI.owner_id=?;`, [id]);
