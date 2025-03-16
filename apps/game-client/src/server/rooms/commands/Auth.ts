@@ -23,7 +23,7 @@ class Auth {
             }
 
             // Create a test character
-            const newCharacter = await db.createCharacter(authData.token, 'TestCharacter', 'human', 'metal', 'noble');
+            const newCharacter = await db.createCharacter(authData.token, 'TestCharacter', 'human', 0, 'noble');
             
             // If the new character's ID doesn't match what the client expects,
             // we need to update it in the database (for test purposes only)
