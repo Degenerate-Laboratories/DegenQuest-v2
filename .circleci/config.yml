@@ -58,8 +58,15 @@ jobs:
       - run:
           name: Restart deployment
           command: |
-            deploy=$(kubectl get deploy -o name)
-            for i in $deploy; do kubectl rollout restart $i; done
+            # Only restart deployments that include 'degen-server' in the name
+            deploy=$(kubectl get deploy -o name | grep degen-server)
+            if [ -n "$deploy" ]; then
+              kubectl rollout restart $deploy
+              echo "Restarted deployment: $deploy"
+            else
+              echo "No degen-server deployment found"
+              exit 1
+            fi
             
 workflows:
   version: 2
