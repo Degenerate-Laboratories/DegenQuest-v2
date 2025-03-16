@@ -5,7 +5,7 @@ class Auth {
         const character = await db.getCharacter(authData.character_id);
 
         if (!character) {
-            Logger.error("[gameroom][onAuth] client could not authentified, joining failed.", character.character_id);
+            Logger.error(`[gameroom][onAuth] character with ID ${authData.character_id} not found, joining failed.`);
             return false;
         }
 

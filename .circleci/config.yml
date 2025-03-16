@@ -2,6 +2,7 @@ version: 2.1
 
 orbs:
   docker: circleci/docker@2.2.0
+  kubernetes: circleci/kubernetes@1.3
 
 jobs:
   build-and-push:
@@ -33,11 +34,44 @@ jobs:
               --push \
               .
 
+  restart-deployment:
+    docker:
+      - image: cimg/base:2024.01
+    steps:
+      - kubernetes/install-kubectl
+      - run:
+          name: Install doctl
+          command: |
+            cd /tmp
+            curl -sL https://github.com/digitalocean/doctl/releases/download/v1.101.0/doctl-1.101.0-linux-amd64.tar.gz | tar -xzv
+            sudo mv doctl /usr/local/bin
+      - run:
+          name: Save DigitalOcean kubeconfig
+          command: |
+            doctl auth init -t $DIGITALOCEAN_ACCESS_TOKEN
+            doctl kubernetes cluster kubeconfig save do-cluster
+      - run:
+          name: Apply PVC if not exists
+          command: |
+            kubectl apply -f k8s/db-pvc.yaml
+      - run:
+          name: Restart deployment
+          command: |
+            kubectl rollout restart deployment degen-server-3ug51ux1
+            
 workflows:
   version: 2
   build-deploy:
     jobs:
       - build-and-push:
+          filters:
+            branches:
+              only: 
+                - master
+                - feature/bun-migration 
+      - restart-deployment:
+          requires:
+            - build-and-push
           filters:
             branches:
               only: 
