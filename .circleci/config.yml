@@ -23,7 +23,7 @@ jobs:
             echo $DIGITALOCEAN_ACCESS_TOKEN | docker login registry.digitalocean.com -u $DIGITALOCEAN_ACCESS_TOKEN --password-stdin
       
       - run:
-          name: Build and push multi-architecture image
+          name: Build and push multi-architecture image (Bun-powered build)
           command: |
             docker buildx build \
               --platform linux/amd64,linux/arm64 \
