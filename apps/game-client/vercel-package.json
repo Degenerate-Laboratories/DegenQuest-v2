@@ -4,7 +4,7 @@
   "description": "DegenQuest Game Client",
   "private": true,
   "scripts": {
-    "client-build": "webpack --config webpack.prod.js"
+    "client-build": "webpack --config webpack.vercel.js"
   },
   "dependencies": {
     "@babylonjs/core": "7.32.3",
