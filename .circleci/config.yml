@@ -1,0 +1,43 @@
+version: 2.1
+
+orbs:
+  docker: circleci/docker@2.2.0
+
+jobs:
+  build-and-push:
+    machine:
+      image: ubuntu-2004:current
+      docker_layer_caching: true
+    steps:
+      - checkout
+      
+      - run:
+          name: Set up Docker buildx
+          command: |
+            docker buildx create --name mybuilder --use
+            docker buildx inspect --bootstrap
+      
+      - run:
+          name: Login to DigitalOcean Container Registry
+          command: |
+            echo $DIGITALOCEAN_ACCESS_TOKEN | docker login registry.digitalocean.com -u $DIGITALOCEAN_ACCESS_TOKEN --password-stdin
+      
+      - run:
+          name: Build and push multi-architecture image
+          command: |
+            docker buildx build \
+              --platform linux/amd64,linux/arm64 \
+              -t registry.digitalocean.com/pioneer/degen-server:${CIRCLE_SHA1} \
+              -t registry.digitalocean.com/pioneer/degen-server:latest \
+              -f ./apps/game-client/Dockerfile \
+              --push \
+              .
+
+workflows:
+  version: 2
+  build-deploy:
+    jobs:
+      - build-and-push:
+          filters:
+            branches:
+              only: master 
