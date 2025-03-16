@@ -75,8 +75,11 @@ export class GameRoom extends Room<GameRoomState> {
     //////////////////////////////////////////////////////////////////////////
     // authorize client based on provided options before WebSocket handshake is complete
     async onAuth(client: Client, authData: any, request: http.IncomingMessage) {
+        Logger.info(`[gameroom][onAuth] Authentication attempt with data:`, JSON.stringify(authData, null, 2));
         let character = await Auth.check(this.database, authData);
-        console.log("[onAuth]", authData);
+        if (character) {
+            Logger.info(`[gameroom][onAuth] Authentication successful for character: ${character.name} (ID: ${character.id})`);
+        }
         return character;
     }
 
