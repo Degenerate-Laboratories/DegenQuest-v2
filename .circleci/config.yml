@@ -38,6 +38,7 @@ jobs:
     docker:
       - image: cimg/base:2024.01
     steps:
+      - checkout
       - kubernetes/install-kubectl
       - run:
           name: Install doctl
