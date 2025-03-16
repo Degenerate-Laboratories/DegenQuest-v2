@@ -1,0 +1,1 @@
+{"workingDirectory":{"server":"apps/game-client","client":"apps/game-client"},"startupCommands":{"server":"npm run server-dev","client":"npm run client-dev"}}

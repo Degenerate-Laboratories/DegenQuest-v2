@@ -1,0 +1,10 @@
+{
+  "workingDirectory": {
+    "server": "apps/game-client",
+    "client": "apps/game-client"
+  },
+  "startupCommands": {
+    "server": "cd apps/game-client; npm run server-dev",
+    "client": "cd apps/game-client; npm run client-dev"
+  }
+} 
