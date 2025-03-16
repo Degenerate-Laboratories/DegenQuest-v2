@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Button, Container, Heading, Text, VStack, Image } from '@chakra-ui/react';
+import { Box, Button, Container, Text, VStack, Image } from '@chakra-ui/react';
 import { motion } from 'framer-motion';
 
 const MotionBox = motion(Box);
