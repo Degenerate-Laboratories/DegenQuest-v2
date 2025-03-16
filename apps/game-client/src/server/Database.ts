@@ -111,6 +111,12 @@ class Database {
             return null;
         }
         
+        // Convert material to number if it's a string
+        if (character.material && typeof character.material === 'string') {
+            character.material = 0; // Default to 0 for any string material
+            Logger.info(`[database] Converting string material to number for character ${id}`);
+        }
+        
         character.abilities = await this.querier.all(`SELECT CA.* FROM character_abilities CA WHERE CA.owner_id=? ORDER BY CA.id ASC;`, [id]);
         character.hotbar = await this.querier.all(`SELECT CA.* FROM character_hotbar CA WHERE CA.owner_id=? ORDER BY CA.digit ASC;`, [id]);
         character.inventory = await this.querier.all(`SELECT CI.* FROM character_inventory CI WHERE CI.owner_id=?;`, [id]);
