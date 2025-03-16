@@ -1,7 +1,8 @@
 {
-  "buildCommand": "npm run client-build",
+  "buildCommand": "chmod +x vercel-build.sh && ./vercel-build.sh",
   "outputDirectory": "dist/client",
   "framework": "vite",
+  "installCommand": "echo 'Skipping pnpm install'",
   "rewrites": [
     { "source": "/(.*)", "destination": "/index.html" }
   ],
