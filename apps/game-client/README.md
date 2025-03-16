@@ -47,7 +47,9 @@ Check out my devlogs on [https://dev.to/orion3d](https://dev.to/orion3d)
 
 > The server should be available locally at [http://localhost:3000](http://localhost:3000)
 
-> The Colyseus monitor should be available at [[http://localhost:3000/monitor](http://localhost:3000/monitor)
+> The Colyseus monitor should be available at [http://localhost:3000/colyseus](http://localhost:3000/colyseus)
+
+> The Colyseus playground should be available at [http://localhost:3000/playground](http://localhost:3000/playground)
 
 ## Load testing
 - Run `npx tsx ./loadtest/test.ts --room game_room --numClients 1 --endpoint ws://localhost:3000`

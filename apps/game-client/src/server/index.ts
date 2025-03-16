@@ -5,6 +5,7 @@ import cors from "cors";
 
 import { Server, matchMaker } from "@colyseus/core";
 import { monitor } from "@colyseus/monitor";
+import { playground } from "@colyseus/playground";
 
 import { WebSocketTransport } from "@colyseus/ws-transport";
 import { GameRoom } from "./rooms/GameRoom";
@@ -74,13 +75,15 @@ class GameServer {
             //matchMaker.createRoom("game_room", { location: "lh_dungeon_01" });
         });
 
+        // start monitor
+        app.use("/colyseus", monitor());
+
         // start dev routes
         if (process.env.NODE_ENV !== "production") {
-            // start monitor
-            app.use("/colyseus", monitor());
+
 
             // bind it as an express middleware
-            //app.use("/playground", playground);
+            app.use("/playground", playground);
         }
 
         //////////////////////////////////////////////////
