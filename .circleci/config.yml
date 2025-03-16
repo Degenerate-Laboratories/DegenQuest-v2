@@ -50,7 +50,7 @@ jobs:
           name: Save DigitalOcean kubeconfig
           command: |
             doctl auth init -t $DIGITALOCEAN_ACCESS_TOKEN
-            doctl kubernetes cluster kubeconfig save do-sfo3-do-cluster-2b9226d
+            doctl kubernetes cluster kubeconfig save do-cluster-2b9226d
       - run:
           name: Apply PVC if not exists
           command: |
