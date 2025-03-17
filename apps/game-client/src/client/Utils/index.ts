@@ -3,11 +3,16 @@ const isLocal = function () {
 };
 
 const apiUrl = function (port) {
+    // Use the Network class's httpUrl property instead
+    // This function is left for backward compatibility
+    console.warn("apiUrl is deprecated. Use client.httpUrl instead");
+    
+    // If we're in local dev, use localhost with port
     if (isLocal()) {
         return "http://localhost:" + port;
     } else {
-        // In production, return base URL with no port (Network.ts already handles the port)
-        return window.location.protocol + "//" + window.location.hostname;
+        // In production, return empty string - forcing use of client.httpUrl
+        return "";
     }
 };
 
