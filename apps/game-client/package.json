@@ -14,12 +14,7 @@
         "server-dev": "ts-node-dev --respawn --inspect --transpile-only src/server/index.ts",
         "server-start": "bun src/server/index.ts",
         "server-build": "tsc && cp -r public dist",
-        "loadtest": "npx tsx loadtest/test.ts --room game_room --numClients 10 --endpoint ws://localhost:3000",
-        "docker:build": "docker build -t degen-server -f Dockerfile ../../",
-        "docker:tag": "docker tag degen-server:latest registry.digitalocean.com/pioneer/degen-server:latest",
-        "docker:run": "docker run --env-file=../../.env degen-server:latest",
-        "docker:push": "docker push registry.digitalocean.com/pioneer/degen-server:latest",
-        "docker:push:all": "npm run docker:build && npm run docker:tag && npm run docker:push"
+        "loadtest": "npx tsx loadtest/test.ts --room game_room --numClients 10 --endpoint ws://localhost:3000"
     },
     "author": "Orion3d",
     "license": "MIT",

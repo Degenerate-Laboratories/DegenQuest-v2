@@ -52,28 +52,5 @@ Check out my devlogs on [https://dev.to/orion3d](https://dev.to/orion3d)
 
 > The Colyseus playground should be available at [http://localhost:3000/playground](http://localhost:3000/playground)
 
-## Running with Docker (for Apple Silicon M1/M2 Macs)
-If you're running on Apple Silicon, you may encounter "invalid ELF header" errors with SQLite. To solve this:
-
-```bash
-# Build the Docker image
-docker build -t degen-server-local .
-
-# Run the Docker container with volume mounted database
-docker run -p 8888:8888 --env-file=.env --volume ./database.db:/app/database.db degen-server-local
-```
-
-Then update your .env file to point to the Docker server:
-```
-GAME_SERVER_URL=ws://localhost:8888
-PORT=8888
-DATABASE_PATH=/app/database.db
-```
-
-And start the client:
-```bash
-npm run client-dev
-```
-
 ## Load testing
 - Run `npx tsx ./loadtest/test.ts --room game_room --numClients 1 --endpoint ws://localhost:3000`
