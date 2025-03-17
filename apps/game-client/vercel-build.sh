@@ -195,4 +195,20 @@ else
   }
 fi
 
+# Copy combined index.html to the output directory 
+echo "📝 Copying combined index.html to the output directory..."
+if [ -f "./index-combined.html" ]; then
+  cp ./index-combined.html ./dist/client/index.html
+  echo "✅ Combined index.html copied successfully!"
+else
+  echo "⚠️ Combined index.html not found. Using default index.html."
+fi
+
+# Ensure public directory files are copied
+echo "📁 Ensuring public directory files are copied..."
+if [ -d "./public" ] && [ -d "./dist/client" ]; then
+  cp -r ./public/* ./dist/client/
+  echo "✅ Public directory files copied successfully!"
+fi
+
 echo "✅ Build completed successfully!" 

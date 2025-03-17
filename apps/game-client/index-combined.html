@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>T5C - The 5th Continent</title>
+        <link rel="stylesheet" href="/styles.css"> 
+        <link rel="icon" type="image/x-icon" href="/favicon.ico">
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+        <!-- Google tag (gtag.js) 
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-JYH151E26D"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            gtag('config', 'G-JYH151E26D');
+        </script>
+        -->
+
+        <!-- CORS Service Worker Registration -->
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/cors-worker.js').then(registration => {
+                        console.log('CORS Service Worker registered with scope:', registration.scope);
+                    }).catch(error => {
+                        console.error('CORS Service Worker registration failed:', error);
+                    });
+                });
+            }
+        </script>
+    </head>
+    <body class="disable-selection">
+        <div id="loadingScreen">
+            <div class="vertical-center">
+                <br>
+                <div id="loadingText">.</div>
+                <div id="loadingTextDetails"></div>
+            </div>
+        </div>
+        <canvas id="renderCanvas"></canvas>
+        
+        <!-- Load either the old bundle approach or the new module approach -->
+        <script>
+            // Try to load the main bundle first (old approach)
+            const mainScript = document.createElement('script');
+            mainScript.src = '/js/bundle.js';
+            mainScript.onerror = function() {
+                console.log('Bundle script not found, trying module approach');
+                // If that fails, try the module approach (new Vite approach)
+                const moduleScript = document.createElement('script');
+                moduleScript.type = 'module';
+                moduleScript.src = '/src/client/index.ts';
+                moduleScript.crossOrigin = 'anonymous';
+                document.body.appendChild(moduleScript);
+                
+                // Also load pep.js for the module approach
+                const pepScript = document.createElement('script');
+                pepScript.rel = 'dns-prefetch';
+                pepScript.src = '/lib/pep.js';
+                pepScript.crossOrigin = 'anonymous';
+                document.body.appendChild(pepScript);
+            };
+            document.body.appendChild(mainScript);
+        </script>
+    </body>
+</html> 

@@ -3,6 +3,9 @@
   "outputDirectory": "dist/client",
   "installCommand": "echo 'Skipping default install - using Bun instead'",
   "rewrites": [
+    { "source": "/styles.css", "destination": "/styles.css" },
+    { "source": "/js/bundle.js", "destination": "/assets/main-CBBUaH51.js" },
+    { "source": "/lib/pep.js", "destination": "/lib/pep.js" },
     { "source": "/assets/(.*)", "destination": "/assets/$1" },
     { "source": "/(.*)\\.js", "destination": "/$1.js" },
     { "source": "/(.*)\\.css", "destination": "/$1.css" },
