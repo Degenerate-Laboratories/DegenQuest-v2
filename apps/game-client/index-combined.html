@@ -5,8 +5,8 @@
         <title>T5C - The 5th Continent</title>
         
         <!-- Disable Cross-Origin headers for troubleshooting -->
-        <meta http-equiv="Cross-Origin-Embedder-Policy" content="unsafe-none">
-        <meta http-equiv="Cross-Origin-Opener-Policy" content="unsafe-none">
+        <meta http-equiv="Cross-Origin-Embedder-Policy" content="credentialless">
+        <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin">
         <meta http-equiv="Cross-Origin-Resource-Policy" content="cross-origin">
         
         <link rel="stylesheet" href="/styles.css"> 
@@ -34,6 +34,15 @@
                     });
                 });
             }
+        </script>
+        
+        <!-- Debug helper for CORS/COEP issues -->
+        <script>
+            window.addEventListener('error', function(e) {
+                if (e.message && (e.message.includes('CORS') || e.message.includes('blocked'))) {
+                    console.error('CORS/COEP Error:', e.message, e.filename);
+                }
+            });
         </script>
     </head>
     <body class="disable-selection">

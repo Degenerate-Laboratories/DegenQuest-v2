@@ -174,6 +174,95 @@ if ('serviceWorker' in navigator) {
 }
 ```
 
+## Understanding ERR_BLOCKED_BY_RESPONSE Error
+
+### What is the ERR_BLOCKED_BY_RESPONSE Error?
+
+The `ERR_BLOCKED_BY_RESPONSE` error is a browser-related issue that occurs when a webpage's response is blocked by certain conditions or rules. This error appears in the browser's DevTools console and is related to but distinct from the COEP issues we've been experiencing.
+
+### Common Causes
+
+1. **CORS (Cross-Origin Resource Sharing) Issues**
+   - Misconfigured CORS headers on servers can lead to blocked requests
+   - Resources from different domains need proper `Access-Control-Allow-Origin` headers
+
+2. **Misconfigured Server Headers**
+   - Incorrect `Content-Security-Policy` (CSP) or `X-Frame-Options` headers
+   - Missing or improperly set headers like `Strict-Transport-Security` or `Content-Type`
+   
+3. **Browser Extensions**
+   - Ad blockers, privacy tools, or security extensions can block requests
+   - This is related to but different from the `ERR_BLOCKED_BY_CLIENT` error which is specifically caused by browser extensions
+
+4. **Network Restrictions**
+   - Firewalls, proxies, or VPNs may block certain web requests
+   - Corporate networks often implement restrictions that can trigger this error
+
+5. **Incorrect API or JavaScript Code**
+   - Errors in API endpoints or JavaScript code sending invalid requests
+
+### Solutions for Vercel Deployment
+
+1. **Verify CORS Settings**
+   - Ensure your `vercel.json` file includes appropriate CORS headers:
+
+```json
+{
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, PUT, DELETE, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "X-Requested-With, Content-Type, Accept"
+        }
+      ]
+    }
+  ]
+}
+```
+
+2. **Check for Browser Extensions During Testing**
+   - Test in incognito mode or with extensions disabled
+   - The `ERR_BLOCKED_BY_CLIENT` error (similar to `ERR_BLOCKED_BY_RESPONSE`) is typically caused by ad blockers
+
+3. **Debug Using Developer Tools**
+   - Use browser's Network tab to identify blocked requests
+   - Check response headers and status codes
+   - Look for specific error details in the console
+
+4. **Modify Content Security Policy**
+   - If needed, adjust your CSP to allow necessary resources:
+
+```json
+{
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; connect-src 'self' https://api.example.com; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
+        }
+      ]
+    }
+  ]
+}
+```
+
+5. **Vercel-Specific Issue with Worker Scripts**
+   - Some Vercel users report CORS headers not being applied to worker scripts
+   - This may be related to GitHub issue #41207 mentioned previously
+   - Consider implementing a middleware solution if headers aren't being honored in production
+
 ## Build Process Lessons Learned
 
 1. **Platform Detection:**
