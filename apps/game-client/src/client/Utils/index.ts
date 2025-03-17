@@ -2,6 +2,7 @@ const isLocal = function () {
     return window.location.host === "localhost:8080";
 };
 
+
 const apiUrl = function (port) {
     // Use the Network class's httpUrl property instead
     // This function is left for backward compatibility
