@@ -9,7 +9,9 @@
     "check-types": "turbo run check-types",
     "server-dev": "cd apps/game-client && npm run server-dev",
     "client-dev": "cd apps/game-client && npm run client-dev",
+    "next-client-dev": "cd apps/game-client-next && npm run dev",
     "start-all": "concurrently \"npm run server-dev\" \"npm run client-dev\"",
+    "start-next": "concurrently \"npm run server-dev\" \"npm run next-client-dev\"",
     "enable-playground": "cd apps/game-client && npm install @colyseus/playground"
   },
   "devDependencies": {
