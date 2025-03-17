@@ -8,7 +8,20 @@ export class DB_SQLLITE {
     constructor() {}
 
     async init(config) {
-        let dbFilePath = process.env.DATABASE_PATH || "./database.db";
+        let dbFilePath = process.env.DB_PATH || process.env.DATABASE_PATH || "./database.db";
+        Logger.info("[database] Trying to connect to database at: " + dbFilePath);
+        
+        // Check if file exists
+        try {
+            if (fs.existsSync(dbFilePath)) {
+                Logger.info("[database] Database file exists");
+            } else {
+                Logger.info("[database] WARNING: Database file does not exist at: " + dbFilePath);
+            }
+        } catch (err) {
+            Logger.error("[database] Error checking database file: ", err);
+        }
+        
         this.db = new sqlite3.Database(dbFilePath, (err: any) => {
             if (err) {
                 Logger.error("[database] Could not connect to database: " + dbFilePath, err);

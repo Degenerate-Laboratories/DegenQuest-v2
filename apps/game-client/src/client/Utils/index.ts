@@ -2,12 +2,19 @@ const isLocal = function () {
     return window.location.host === "localhost:8080";
 };
 
+
 const apiUrl = function (port) {
-    let url = "https://" + window.location.hostname;
+    // Use the Network class's httpUrl property instead
+    // This function is left for backward compatibility
+    console.warn("apiUrl is deprecated. Use client.httpUrl instead");
+    
+    // If we're in local dev, use localhost with port
     if (isLocal()) {
-        url = "http://localhost:" + port;
+        return "http://localhost:" + port;
+    } else {
+        // In production, return empty string - forcing use of client.httpUrl
+        return "";
     }
-    return url;
 };
 
 export { isLocal, apiUrl };

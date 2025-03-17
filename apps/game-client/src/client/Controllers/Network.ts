@@ -7,16 +7,27 @@ export class Network {
     public _client: Client;
     public connectionSuccessful: boolean = false;
     public serverUrl: string = "";
+    public httpUrl: string = "";
 
-    constructor(port = 3000) {
+    constructor(port = 3000, serverUrl = null) {
         try {
-            // Use localhost WebSocket URL
-            const url = "ws://localhost:" + port;
+            // Use provided serverUrl or default to production server
+            const url = serverUrl || "ws://134.199.184.18:80";
+            
+            // Extract host and port from the URL for http endpoint
+            const urlParts = url.replace('ws://', '').split(':');
+            const host = urlParts[0];
+            const wsPort = urlParts.length > 1 ? urlParts[1] : '80';
+            
+            const httpBase = `http://${host}:${wsPort}`;
+            
             this.serverUrl = url;
+            this.httpUrl = httpBase;
             
             console.log("%c[Network] Connecting to game server: " + url, "color: green; font-weight: bold");
+            console.log("%c[Network] HTTP endpoint: " + httpBase, "color: green; font-weight: bold");
             
-            // Add WebSocket debugging
+            // Configure client with both endpoints
             this._client = new Client(url);
             
             // Enable debug logging

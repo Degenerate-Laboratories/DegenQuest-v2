@@ -28,6 +28,11 @@ export class GameRoom extends Room<GameRoomState> {
         this.setMetadata(options);
 
         this.config = new Config();
+        
+        // Initialize database first
+        this.database = new Database(this.config);
+        await this.database.init();
+        Logger.info("[gameroom][onCreate] Database initialized");
 
         // initialize navmesh
         const navMesh = await loadNavMeshFromFile(options.location);
@@ -51,10 +56,6 @@ export class GameRoom extends Room<GameRoomState> {
         // set max clients
         this.maxClients = this.config.maxClients;
         this.autoDispose = true;
-
-        // initialize database
-        this.database = new Database(this.config);
-        await this.database.init();
 
         ///////////////////////////////////////////////////////////////////////////
         // if players are in a room, make sure we save any changes to the database.

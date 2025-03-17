@@ -1,91 +1,79 @@
 # DegenQuest Deployment Documentation
 
-## Docker Setup
+## CI/CD Setup with CircleCI
 
 ### Prerequisites
-- Docker installed
-- Node.js and npm installed
+- GitHub repository connected to CircleCI
+- Access to DigitalOcean Kubernetes cluster
 - Access to DigitalOcean container registry
 
-### Local Development Environment
+### Automated Deployment Process
 
-#### Building the Docker Image
-```bash
-# From the game server directory
-docker build -t degenquest/game-server:latest .
-```
+The deployment process is fully automated through CircleCI:
 
-#### Running Locally
-```bash
-# Run the container with environment variables
-docker run -p 3000:3000 --env-file=.env degenquest/game-server:latest
-```
+1. Code is pushed to specified branches (master, local-works, begin-pull-master)
+2. CircleCI automatically builds and pushes Docker images
+3. Kubernetes deployments are updated automatically
 
 ### Environment Variables
 Required environment variables for the game server:
 ```
 PORT=3000
-NODE_ENV=development
+NODE_ENV=production
 # Add other required environment variables
 ```
 
 ### Client Configuration
-The game client needs to be configured to connect to the correct server URL:
-
-- Development: `http://localhost:3000`
-- Production: `https://[your-domain]`
-
-## Deployment Process
-
-### 1. Local Testing
-1. Build Docker image
-2. Run container locally
-3. Test game client connection
-4. Verify multiplayer functionality
-
-### 2. Cloud Deployment
-1. Tag image for DigitalOcean registry
-2. Push image to registry
-3. Deploy container
-4. Configure domain and SSL
-
-### Docker Commands Reference
-```bash
-# Build image
-docker build -t degenquest/game-server:latest .
-
-# Tag for DigitalOcean
-docker tag degenquest/game-server:latest registry.digitalocean.com/pioneer/degenquest/game-server:latest
-
-# Push to registry
-docker push registry.digitalocean.com/pioneer/degenquest/game-server:latest
-
-# Run locally
-docker run --env-file=.env degenquest/game-server:latest
+The game client connects to the production server URL:
+```typescript
+// Network.ts
+const url = "ws://134.199.184.144:80";
+const httpBase = "http://134.199.184.144:80";
 ```
+
+## Deployment Infrastructure
+
+### 1. CircleCI Pipeline
+CircleCI handles the build and deployment pipeline:
+- Builds Docker images
+- Pushes to DigitalOcean Container Registry
+- Updates Kubernetes deployments
+
+### 2. Kubernetes Cluster
+- Manages container orchestration
+- Ensures high availability
+- Handles scaling and load balancing
+
+### 3. Services
+- Uses SessionAffinity for client connections
+- Exposes game server via LoadBalancer
 
 ## Troubleshooting
 
 ### Common Issues
 1. Connection refused
-   - Check if container is running
-   - Verify port mapping
-   - Check firewall settings
+   - Check if pods are running
+   - Verify service configuration
+   - Check network policies
 
 2. Environment variables missing
-   - Verify .env file exists
-   - Check environment variable names
-   - Ensure Docker has access to env file
+   - Verify environment variables in Kubernetes deployment
+   - Check for ConfigMaps and Secrets
 
 3. Client can't connect
    - Verify server URL configuration
    - Check CORS settings
-   - Confirm network connectivity
+   - Confirm WebSocket connectivity
+
+4. Seat reservation expired
+   - Verify session affinity is enabled
+   - Check for multiple server instances
+   - Consider Redis-based state sharing
 
 ## Monitoring and Maintenance
 
 ### Health Checks
-- Container status
+- Pod status
 - Server response time
 - Active connections
 - Memory usage
@@ -96,6 +84,5 @@ docker run --env-file=.env degenquest/game-server:latest
 - Configuration backups
 
 ### Scaling Considerations
-- Container orchestration
-- Load balancing
+- Horizontal pod autoscaling
 - Resource monitoring 

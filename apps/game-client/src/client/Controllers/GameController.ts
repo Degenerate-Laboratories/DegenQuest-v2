@@ -126,7 +126,7 @@ export class GameController {
     async initializeGameData() {
         const result = await axios.request({
             method: "GET",
-            url: apiUrl(this.config.port) + "/load_game_data",
+            url: this.client.httpUrl + "/load_game_data",
         });
         this._gameData = result.data.data;
         console.log("[GAME] loaded game data", this._gameData);
@@ -215,21 +215,26 @@ export class GameController {
 
     // check login details
     public async forceLogin() {
-        const req = await axios.request({
-            method: "POST",
-            url: apiUrl(this.config.port) + "/returnRandomUser",
-        });
-        let character = req.data.user;
-        if (character) {
-            // set user
-            this.setUser({
-                id: character.user_id,
-                username: character.username,
-                password: character.password,
-                token: character.token,
+        try {
+            const req = await axios.request({
+                method: "POST",
+                url: this.client.httpUrl + "/returnRandomUser",
             });
-            //set character
-            this.setCharacter(character);
+            let character = req.data.user;
+            if (character) {
+                // set user
+                this.setUser({
+                    id: character.user_id,
+                    username: character.username,
+                    password: character.password,
+                    token: character.token,
+                });
+                //set character
+                this.setCharacter(character);
+            }
+        } catch (error) {
+            console.error("Failed to force login:", error);
+            // Continue without login if failed
         }
     }
 
@@ -239,57 +244,68 @@ export class GameController {
 
     // check login details
     public async isValidLogin() {
-        let user = this.currentUser;
+        try {
+            let user = this.currentUser;
 
-        // check user exists else send back to login
-        const req = await axios.request({
-            method: "POST",
-            params: { token: user.token },
-            url: apiUrl(this.config.port) + "/check",
-        });
+            // check user exists else send back to login
+            const req = await axios.request({
+                method: "POST",
+                params: { token: user.token },
+                url: this.client.httpUrl + "/check",
+            });
 
-        // check req status
-        if (req.status === 200) {
-            let user = req.data.user;
-            this.setUser(user);
-            return user;
-        } else {
-            // something went wrong
-            console.error("Something went wrong.");
+            // check req status
+            if (req.status === 200) {
+                let user = req.data.user;
+                this.setUser(user);
+                return user;
+            } else {
+                // something went wrong
+                console.error("Something went wrong.");
+                return null;
+            }
+        } catch (error) {
+            console.error("Error validating login:", error);
+            return null;
         }
     }
 
     // login as this character
     public async login(username, password) {
-        // make sure both the username and password is entered.
-        if (!username || !password) {
-            console.error("Please enter both the username and the password.");
-            return false;
-        }
+        try {
+            // make sure both the username and password is entered.
+            if (!username || !password) {
+                console.error("Please enter both the username and the password.");
+                return false;
+            }
 
-        // send login data
-        const req = await axios.request({
-            method: "POST",
-            params: {
-                username: username,
-                password: password,
-            },
-            url: apiUrl(this.config.port) + "/login",
-        });
+            // send login data
+            const req = await axios.request({
+                method: "POST",
+                params: {
+                    username: username,
+                    password: password,
+                },
+                url: this.client.httpUrl + "/login",
+            });
 
-        // check req status
-        if (req.status === 200) {
-            // user was found or created
-            this._currentUser = req.data.user;
+            // check req status
+            if (req.status === 200) {
+                // user was found or created
+                this._currentUser = req.data.user;
 
-            // save token to local storage
-            localStorage.setItem("t5c_token", req.data.user.token);
+                // save token to local storage
+                localStorage.setItem("t5c_token", req.data.user.token);
 
-            // go to character selection page
-            return true;
-        } else {
-            // something went wrong
-            console.error("Something went wrong.");
+                // go to character selection page
+                return true;
+            } else {
+                // something went wrong
+                console.error("Something went wrong.");
+                return false;
+            }
+        } catch (error) {
+            console.error("Login error:", error);
             return false;
         }
     }
