@@ -9,8 +9,16 @@ jobs:
     machine:
       image: ubuntu-2004:current
       docker_layer_caching: true
+    resource_class: large
     steps:
       - checkout
+      
+      # Restore Docker cache
+      - restore_cache:
+          keys:
+            - docker-cache-{{ .Branch }}-{{ .Revision }}
+            - docker-cache-{{ .Branch }}-
+            - docker-cache-
       
       - run:
           name: Set up Docker buildx
@@ -26,26 +34,65 @@ jobs:
       - run:
           name: Build and push amd64 image (Bun-powered build)
           command: |
+            # Use buildkit's cache capabilities
             docker buildx build \
               --platform linux/amd64 \
               -t registry.digitalocean.com/pioneer/degen-server:${CIRCLE_SHA1} \
               -t registry.digitalocean.com/pioneer/degen-server:latest \
               -f ./apps/game-client/Dockerfile \
+              --cache-from=registry.digitalocean.com/pioneer/degen-server:latest \
+              --build-arg BUILDKIT_INLINE_CACHE=1 \
               --push \
               .
+      
+      # Save Docker cache
+      - save_cache:
+          key: docker-cache-{{ .Branch }}-{{ .Revision }}
+          paths:
+            - /home/circleci/.docker/buildx
 
   restart-deployment:
     docker:
       - image: cimg/base:2024.01
+    resource_class: small
     steps:
       - checkout
+      
+      # Use a cached installation of kubectl if possible
+      - restore_cache:
+          keys:
+            - v1-kubectl-{{ .Branch }}
+            - v1-kubectl-
+      
       - kubernetes/install-kubectl
+      
+      - save_cache:
+          key: v1-kubectl-{{ .Branch }}
+          paths:
+            - /home/circleci/bin/kubectl
+      
+      # Use a cached installation of doctl if possible
+      - restore_cache:
+          keys:
+            - v1-doctl-{{ .Branch }}
+            - v1-doctl-
+            
       - run:
           name: Install doctl
           command: |
-            cd /tmp
-            curl -sL https://github.com/digitalocean/doctl/releases/download/v1.101.0/doctl-1.101.0-linux-amd64.tar.gz | tar -xzv
-            sudo mv doctl /usr/local/bin
+            if [ ! -f /usr/local/bin/doctl ]; then
+              cd /tmp
+              curl -sL https://github.com/digitalocean/doctl/releases/download/v1.101.0/doctl-1.101.0-linux-amd64.tar.gz | tar -xzv
+              sudo mv doctl /usr/local/bin
+            else
+              echo "Using cached doctl installation"
+            fi
+      
+      - save_cache:
+          key: v1-doctl-{{ .Branch }}
+          paths:
+            - /usr/local/bin/doctl
+            
       - run:
           name: Save DigitalOcean kubeconfig
           command: |
