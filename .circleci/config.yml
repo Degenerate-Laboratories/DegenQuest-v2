@@ -144,6 +144,7 @@ workflows:
                 - feature/bun-migration
                 - local-works
                 - begin-pull-master
+                - fix-server-crash
       - restart-deployment:
           requires:
             - build-and-push
@@ -153,4 +154,5 @@ workflows:
                 - master
                 - feature/bun-migration
                 - local-works
-                - begin-pull-master 
+                - begin-pull-master
+                - fix-server-crash 
