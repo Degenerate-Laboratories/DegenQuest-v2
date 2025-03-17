@@ -68,7 +68,10 @@ check_endpoint() {
             local version=$(echo "$response" | jq -r '.version // "unknown"')
             
             # Add version match indicator
-            if [ "$version" = "$LOCAL_VERSION" ]; then
+            if [ -z "$version" ] || [ "$version" = "null" ]; then
+                # Handle empty or null version
+                echo -e "${GREEN}✓ $name is healthy (HTTP $http_code)${NC} - ${YELLOW}No version reported${NC}"
+            elif [ "$version" = "$LOCAL_VERSION" ]; then
                 echo -e "${GREEN}✓ $name is healthy (HTTP $http_code) - Version: ${YELLOW}$version${NC} ${GREEN}✓${NC}"
             else
                 echo -e "${GREEN}✓ $name is healthy (HTTP $http_code) - Version: ${YELLOW}$version${NC} ${RED}≠ $LOCAL_VERSION${NC}"
