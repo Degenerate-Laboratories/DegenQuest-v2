@@ -143,6 +143,7 @@ workflows:
                 - master
                 - feature/bun-migration
                 - local-works
+                - begin-pull-master
       - restart-deployment:
           requires:
             - build-and-push
@@ -151,4 +152,5 @@ workflows:
               only: 
                 - master
                 - feature/bun-migration
-                - local-works 
+                - local-works
+                - begin-pull-master 
