@@ -158,21 +158,41 @@ build-from-source=false
 python=$(which python3)
 EOL
 
-# Install only production dependencies to reduce compilation issues
-echo "📚 Installing dependencies with Bun (production only)..."
-${BUN_EXECUTABLE} install --production || {
-  echo "Production install failed, trying with legacy-peer-deps..."
-  ${BUN_EXECUTABLE} install --production --legacy-peer-deps || {
-    echo "Failed to install dependencies with production flag, trying full install..."
-    ${BUN_EXECUTABLE} install --legacy-peer-deps
+# Install ALL dependencies (including dev dependencies)
+echo "📚 Installing ALL dependencies with Bun..."
+${BUN_EXECUTABLE} install || {
+  echo "Full install failed, trying with legacy-peer-deps..."
+  ${BUN_EXECUTABLE} install --legacy-peer-deps || {
+    echo "Failed to install dependencies. Attempting to continue anyway..."
   }
 }
 
+# Check if vite exists and is executable
+if [ ! -f "./node_modules/.bin/vite" ]; then
+  echo "Vite not found in node_modules/.bin. Installing vite explicitly..."
+  ${BUN_EXECUTABLE} add vite@latest --dev
+fi
+
 # Build the client with Bun
 echo "🔨 Building the client with Bun..."
-${BUN_EXECUTABLE} run vite build || {
-  echo "Failed to build the client."
-  exit 1
-}
+if [ -f "./node_modules/.bin/vite" ]; then
+  echo "Using local Vite installation..."
+  ${BUN_EXECUTABLE} node_modules/.bin/vite build || {
+    echo "Failed to build with local Vite. Trying with npx..."
+    ${BUN_EXECUTABLE} run --bun npx vite build || {
+      echo "Failed to build the client."
+      exit 1
+    }
+  }
+else
+  echo "Using Bun to run vite build..."
+  ${BUN_EXECUTABLE} run vite build || {
+    echo "Failed to build with Bun run. Trying with npx..."
+    ${BUN_EXECUTABLE} run --bun npx vite build || {
+      echo "Failed to build the client."
+      exit 1
+    }
+  }
+fi
 
 echo "✅ Build completed successfully!" 
