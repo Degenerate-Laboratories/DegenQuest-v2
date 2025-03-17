@@ -24,12 +24,20 @@ RUN npm install --legacy-peer-deps && \
 # Copy the rest of the app
 COPY ./apps/game-client/ ./
 
+# Create data directory
+RUN mkdir -p /data && chmod 777 /data
+
+# Copy the database file to the data directory
+COPY ./apps/game-client/database.db /data/
+RUN chmod 666 /data/database.db
+
 # Expose port 8888
 EXPOSE 8888
 
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=8888
+ENV DB_PATH=/data/database.db
 
 # Start the server
 CMD ["npm", "run", "server-dev"] 

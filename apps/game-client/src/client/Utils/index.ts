@@ -3,11 +3,12 @@ const isLocal = function () {
 };
 
 const apiUrl = function (port) {
-    let url = "https://" + window.location.hostname;
     if (isLocal()) {
-        url = "http://localhost:" + port;
+        return "http://localhost:" + port;
+    } else {
+        // In production, return base URL with no port (Network.ts already handles the port)
+        return window.location.protocol + "//" + window.location.hostname;
     }
-    return url;
 };
 
 export { isLocal, apiUrl };

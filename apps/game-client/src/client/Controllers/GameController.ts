@@ -126,7 +126,7 @@ export class GameController {
     async initializeGameData() {
         const result = await axios.request({
             method: "GET",
-            url: apiUrl(this.config.port) + "/load_game_data",
+            url: this.client.httpUrl + "/load_game_data",
         });
         this._gameData = result.data.data;
         console.log("[GAME] loaded game data", this._gameData);

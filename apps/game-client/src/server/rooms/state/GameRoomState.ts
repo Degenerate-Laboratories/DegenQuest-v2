@@ -65,6 +65,15 @@ export class GameRoomState extends Schema {
     }
 
     public update(deltaTime: number) {
+        // Update server time
+        this.serverTime += deltaTime;
+        
+        // Null check for entityCTRL
+        if (!this.entityCTRL) {
+            console.warn("[GameRoomState] entityCTRL not initialized in update()");
+            return;
+        }
+        
         // updating entities
         if (this.entityCTRL.hasEntities()) {
             this.entityCTRL.all.forEach((entity) => {
@@ -74,7 +83,9 @@ export class GameRoomState extends Schema {
         }
 
         // update spawn controller
-        this.spawnCTRL.update(deltaTime);
+        if (this.spawnCTRL) {
+            this.spawnCTRL.update(deltaTime);
+        }
     }
 
     getEntity(sessionId) {

@@ -1,6 +1,6 @@
 import axios from "axios";
-
 import { Ability, Race, Item, Quest } from "../../../shared/types";
+import { GameData } from "../../GameData";
 
 export class gameDataCTRL {
     private _gameData = {
@@ -14,17 +14,28 @@ export class gameDataCTRL {
     constructor() {}
 
     async initialize() {
-        const options = {
-            method: "GET",
-            url: "http://localhost:3000/load_game_data",
-            params: { category: "all", count: "2" },
-            headers: {
-                "X-RapidAPI-Key": "your-rapid-key",
-                "X-RapidAPI-Host": "famous-quotes4.p.rapidapi.com",
-            },
-        };
-        const result = await axios.request(options);
-        this._gameData = result.data.data;
+        try {
+            // Direct initialization instead of API call to avoid localhost dependencies
+            this._gameData = {
+                items: GameData.load("items"),
+                abilities: GameData.load("abilities"),
+                locations: GameData.load("locations"),
+                races: GameData.load("races"),
+                quests: GameData.load("quests"),
+            };
+            
+            console.log("[gameDataCTRL] Game data initialized successfully");
+        } catch (error) {
+            console.error("[gameDataCTRL] Failed to initialize game data:", error);
+            // Initialize with empty data to prevent crashes
+            this._gameData = {
+                items: [],
+                abilities: [],
+                locations: [],
+                races: [],
+                quests: [],
+            };
+        }
     }
 
     public get(type, key) {
