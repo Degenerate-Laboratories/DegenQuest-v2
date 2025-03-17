@@ -68,7 +68,8 @@ cd skills
 **Features**:
 - Checks health of four endpoints: localhost, docker container, development server, and production server
 - Shows HTTP status code for each endpoint
-- For healthy endpoints (HTTP 200), displays the version number automatically
+- Reads local package.json version and compares with server reported versions
+- For healthy endpoints (HTTP 200), displays the version number with match/mismatch indicator
 - Color-coded output for easy status identification
 - Smart response type detection - warns if an endpoint returns HTML instead of JSON
 
@@ -77,6 +78,8 @@ cd skills
 
 **Example Output**:
 ```
+Local package.json version: 0.4.1
+
 Checking Localhost health...
 ✗ Localhost is not healthy (HTTP 000)
 
@@ -85,7 +88,15 @@ Checking Docker Container health...
   This endpoint may be misconfigured or returning the client app instead of health data
 
 Checking Development Server health...
-✓ Development Server is healthy (HTTP 200) - Version: 0.4.1
+✓ Development Server is healthy (HTTP 200) - Version: 0.4.1 ✓
+
+Checking Production Server health...
+✓ Production Server is healthy (HTTP 200) - Version: 0.4.0 ≠ 0.4.1
+
+Health Check Summary
+Local Version: 0.4.1
+Run with --verbose for detailed information
+Use get-status.sh for more comprehensive status information
 ```
 
 **Endpoints Checked**:

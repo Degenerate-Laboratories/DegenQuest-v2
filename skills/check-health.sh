@@ -24,6 +24,18 @@ DOCKER_URL="http://localhost:3002/health"
 DEVELOP_URL="http://134.199.184.18:8888/health"
 PRODUCTION_URL="http://134.199.184.18/health"
 
+# Get current version from package.json for comparison
+PKG_PATH="../apps/game-client/package.json"
+if [ -f "$PKG_PATH" ]; then
+    LOCAL_VERSION=$(grep -o '"version": "[^"]*"' "$PKG_PATH" | cut -d'"' -f4)
+    echo -e "${BLUE}Local package.json version: ${YELLOW}$LOCAL_VERSION${NC}"
+    echo ""
+else
+    echo -e "${YELLOW}Warning: Could not find package.json at $PKG_PATH${NC}"
+    LOCAL_VERSION="unknown"
+    echo ""
+fi
+
 VERBOSE=false
 if [ "$1" == "--verbose" ]; then
     VERBOSE=true
@@ -54,7 +66,13 @@ check_endpoint() {
         # Check if response is valid JSON before parsing
         if echo "$response" | jq empty 2>/dev/null; then
             local version=$(echo "$response" | jq -r '.version // "unknown"')
-            echo -e "${GREEN}✓ $name is healthy (HTTP $http_code) - Version: ${YELLOW}$version${NC}"
+            
+            # Add version match indicator
+            if [ "$version" = "$LOCAL_VERSION" ]; then
+                echo -e "${GREEN}✓ $name is healthy (HTTP $http_code) - Version: ${YELLOW}$version${NC} ${GREEN}✓${NC}"
+            else
+                echo -e "${GREEN}✓ $name is healthy (HTTP $http_code) - Version: ${YELLOW}$version${NC} ${RED}≠ $LOCAL_VERSION${NC}"
+            fi
             
             # Parse and display additional info in verbose mode
             if [ "$VERBOSE" = true ]; then
@@ -100,5 +118,8 @@ check_endpoint "Production Server" "$PRODUCTION_URL"
 
 # Summary
 echo -e "${BLUE}Health Check Summary${NC}"
+if [ "$LOCAL_VERSION" != "unknown" ]; then
+    echo -e "Local Version: ${YELLOW}$LOCAL_VERSION${NC}"
+fi
 echo -e "Run with --verbose for detailed information"
 echo -e "Use get-status.sh for more comprehensive status information" 
