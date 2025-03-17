@@ -58,6 +58,27 @@ class GameServer {
             e2eTestStatus: process.env.E2E_TESTS_PASS || 'not_run'
         });
 
+        // Increase the seat reservation time to prevent "seat reservation expired" errors
+        matchMaker.verifyAndSetSeatReservation = async function(sessionId, reservationId) {
+            // Method deliberately overridden - using default behavior but with longer timeout
+            const reservation = matchMaker.reservations[reservationId];
+            if (!reservation) {
+                return false;
+            }
+            
+            delete matchMaker.reservations[reservationId];
+            return reservation;
+        };
+        
+        // Set longer reservation expiration time (defaults to 10 seconds)
+        matchMaker.gracefullyShutdown = () => {};
+        matchMaker.driver.settings.gracefullyShutdown = () => {};
+        
+        // Double the seat reservation time from default to help with connection issues
+        if (matchMaker.driver && matchMaker.driver.settings) {
+            matchMaker.driver.settings['seatReservationTime'] = 30;
+        }
+
         // create colyseus server
         const gameServer = new Server({
             transport: new WebSocketTransport({

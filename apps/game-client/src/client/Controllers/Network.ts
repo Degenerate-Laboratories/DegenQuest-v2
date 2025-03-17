@@ -8,8 +8,10 @@ export class Network {
     public connectionSuccessful: boolean = false;
     public serverUrl: string = "";
     public httpUrl: string = "";
+    private maxRetries: number = 3;
+    private currentRetry: number = 0;
 
-    constructor(port = 3000, serverUrl = null) {
+    constructor(port = 80, serverUrl: string | null = null) {
         try {
             // Use provided serverUrl or default to production server
             const url = serverUrl || "ws://134.199.184.18:80";
@@ -93,18 +95,42 @@ export class Network {
         } catch (error) {
             console.error("%c[Network] Room creation test failed:", "color: red; font-weight: bold", error);
             console.error("%c[Network] Error details:", "color: red", error);
+            
+            // Add retry logic for seat reservation errors
+            if (error.message && error.message.includes("seat reservation expired") && this.currentRetry < this.maxRetries) {
+                this.currentRetry++;
+                console.log(`%c[Network] Retrying connection (${this.currentRetry}/${this.maxRetries})...`, "color: yellow; font-weight: bold");
+                
+                // Wait before retrying
+                setTimeout(() => this.createTestRoom(), 2000);
+            }
         }
     }
 
     public async joinRoom(roomId, token, character_id): Promise<any> {
         try {
             console.log(`%c[Network] Attempting to join room: ${roomId}`, "color: yellow");
-            const room = await this._client.joinById(roomId, {
-                token: token,
-                character_id: character_id,
-            });
-            console.log(`%c[Network] Successfully joined room: ${roomId}`, "color: green");
-            return room;
+            
+            // Add retry logic for joining rooms
+            for (let attempt = 0; attempt < 3; attempt++) {
+                try {
+                    const room = await this._client.joinById(roomId, {
+                        token: token,
+                        character_id: character_id,
+                    });
+                    console.log(`%c[Network] Successfully joined room: ${roomId}`, "color: green");
+                    return room;
+                } catch (joinError) {
+                    if (joinError.message && joinError.message.includes("seat reservation expired") && attempt < 2) {
+                        console.warn(`%c[Network] Seat reservation expired, retrying (${attempt + 1}/3)...`, "color: orange");
+                        // Wait before retrying
+                        await new Promise(resolve => setTimeout(resolve, 2000 * (attempt + 1)));
+                        continue;
+                    }
+                    // Rethrow if it's not a seat reservation error or we've tried too many times
+                    throw joinError;
+                }
+            }
         } catch (error) {
             console.error(`%c[Network] Failed to join room: ${roomId}`, "color: red", error);
             throw error;
@@ -112,7 +138,20 @@ export class Network {
     }
 
     public async joinChatRoom(data): Promise<any> {
-        return await this._client.joinOrCreate("chat_room", data);
+        // Add retry logic for joining chat room
+        for (let attempt = 0; attempt < 3; attempt++) {
+            try {
+                return await this._client.joinOrCreate("chat_room", data);
+            } catch (error) {
+                if (error.message && error.message.includes("seat reservation expired") && attempt < 2) {
+                    console.warn(`%c[Network] Chat room seat reservation expired, retrying (${attempt + 1}/3)...`, "color: orange");
+                    // Wait before retrying
+                    await new Promise(resolve => setTimeout(resolve, 2000 * (attempt + 1)));
+                    continue;
+                }
+                throw error;
+            }
+        }
     }
 
     public async findCurrentRoom(currentRoomKey): Promise<any> {
@@ -130,30 +169,43 @@ export class Network {
     }
 
     public async joinOrCreateRoom(location, token, character_id): Promise<any> {
-        // find all exisiting rooms
-        let rooms = await this._client.getAvailableRooms("game_room");
+        // Add retry logic for joining or creating rooms
+        for (let attempt = 0; attempt < 3; attempt++) {
+            try {
+                // find all exisiting rooms
+                let rooms = await this._client.getAvailableRooms("game_room");
 
-        // rooms exists
-        if (rooms.length > 0) {
-            // do we already have a room for the specified location
-            let roomIdFound: boolean | string = false;
-            rooms.forEach((room) => {
-                if (room.metadata.location === location) {
-                    roomIdFound = room.roomId;
+                // rooms exists
+                if (rooms.length > 0) {
+                    // do we already have a room for the specified location
+                    let roomIdFound: boolean | string = false;
+                    rooms.forEach((room) => {
+                        if (room.metadata.location === location) {
+                            roomIdFound = room.roomId;
+                        }
+                    });
+
+                    // if so, let's join it
+                    if (roomIdFound !== false) {
+                        return await this.joinRoom(roomIdFound, token, character_id);
+                    }
                 }
-            });
 
-            // if so, let's join it
-            if (roomIdFound !== false) {
-                return await this.joinRoom(roomIdFound, token, character_id);
+                // else create a new room for that location
+                return await this._client.create("game_room", {
+                    location: location,
+                    token: token,
+                    character_id: character_id,
+                });
+            } catch (error) {
+                if (error.message && error.message.includes("seat reservation expired") && attempt < 2) {
+                    console.warn(`%c[Network] Join/Create room seat reservation expired, retrying (${attempt + 1}/3)...`, "color: orange");
+                    // Wait before retrying
+                    await new Promise(resolve => setTimeout(resolve, 2000 * (attempt + 1)));
+                    continue;
+                }
+                throw error;
             }
         }
-
-        // else create a new room for that location
-        return await this._client.create("game_room", {
-            location: location,
-            token: token,
-            character_id: character_id,
-        });
     }
 }

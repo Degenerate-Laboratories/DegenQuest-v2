@@ -142,8 +142,8 @@ export class ServerSelectionScene {
                         console.log("%c[ServerSelection] LOCAL SERVER SELECTED", "color: red; font-weight: bold");
                     } else {
                         // Replace the client with remote server URL
-                        const remoteUrl = "ws://134.199.184.18";
-                        this.game.client = new Network(this.config.port || 3000, remoteUrl);
+                        const remoteUrl = "ws://134.199.184.18:80";
+                        this.game.client = new Network(80, remoteUrl);
                         console.log("%c[ServerSelection] REMOTE SERVER SELECTED", "color: red; font-weight: bold");
                     }
                     

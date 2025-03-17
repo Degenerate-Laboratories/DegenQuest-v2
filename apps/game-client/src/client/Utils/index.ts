@@ -1,5 +1,6 @@
 const isLocal = function () {
-    return window.location.host === "localhost:8080";
+    // Check if running on any localhost port
+    return window.location.hostname === "localhost";
 };
 
 
@@ -12,8 +13,8 @@ const apiUrl = function (port) {
     if (isLocal()) {
         return "http://localhost:" + port;
     } else {
-        // In production, return empty string - forcing use of client.httpUrl
-        return "";
+        // In production, use the production server IP
+        return "http://134.199.184.18:80";
     }
 };
 
