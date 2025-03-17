@@ -66,7 +66,7 @@
                 
                 // Add error handler after appending to catch load errors
                 mainScript.onerror = function() {
-                    console.log('Bundle script not found, trying module approach');
+                    console.log('Bundle script not found, trying TypeScript module approach');
                     
                     // Load pep.js first
                     const pepScript = document.createElement('script');
@@ -74,10 +74,10 @@
                     pepScript.crossOrigin = 'anonymous';
                     document.body.appendChild(pepScript);
                     
-                    // Then use inline module import
+                    // Load TypeScript entry point directly
                     const moduleScript = document.createElement('script');
                     moduleScript.type = 'module';
-                    moduleScript.textContent = 'import "/src/client/index.ts";';
+                    moduleScript.src = '/src/client/index.ts';
                     document.body.appendChild(moduleScript);
                 };
             } catch (error) {

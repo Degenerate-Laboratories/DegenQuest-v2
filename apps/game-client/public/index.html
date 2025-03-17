@@ -28,9 +28,7 @@
         </div>
         <canvas id="renderCanvas"></canvas>
         <script src="/lib/pep.js"></script>
-        <!-- Use a regular script tag to load the main entry point through Vite's client -->
-        <script type="module">
-            import '/src/client/index.ts';
-        </script>
+        <!-- Import the TypeScript entry point directly -->
+        <script type="module" src="/src/client/index.ts"></script>
     </body>
 </html>

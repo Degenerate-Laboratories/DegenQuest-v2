@@ -14,7 +14,7 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       input: {
-        main: resolve(__dirname, 'src/client/index.ts'),
+        main: resolve(__dirname, 'index.html'),
       },
     },
   },
