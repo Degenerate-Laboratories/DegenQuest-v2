@@ -104,15 +104,40 @@ echo "📋 Bun version:"
   exit 1
 }
 
+# Handle Node.js 22 compatibility issues with native modules
+echo "🔧 Setting up environment for Node.js 22 compatibility..."
+
 # Set environment variables for node-gyp
-echo "Setting NODE_GYP_FORCE_PYTHON to python3"
 export NODE_GYP_FORCE_PYTHON="$(which python3)"
 
-# Install dependencies with Bun
-echo "📚 Installing dependencies with Bun..."
-./bun/bun install || {
-  echo "Failed to install dependencies."
-  exit 1
+# Skip native compilation where possible
+export NODE_OPTIONS="--max-old-space-size=4096"
+export SKIP_NODE_GYP="1"
+export NODE_GYP_SKIP="1" 
+export NPM_CONFIG_BUILD_FROM_SOURCE="false"
+
+# For node-sqlite3 and other problematic modules
+export SQLITE_SKIP_GYPI="1"
+export SKIP_SQLITE_BINARY="1"
+
+# Create an .npmrc file to help with native module issues
+echo "Creating .npmrc with node-gyp configuration..."
+cat > .npmrc << EOL
+node-gyp-force-python=python3
+prefer-offline=true
+legacy-peer-deps=true
+build-from-source=false
+python=$(which python3)
+EOL
+
+# Install only production dependencies to reduce compilation issues
+echo "📚 Installing dependencies with Bun (production only)..."
+./bun/bun install --production || {
+  echo "Production install failed, trying with legacy-peer-deps..."
+  ./bun/bun install --production --legacy-peer-deps || {
+    echo "Failed to install dependencies with production flag, trying full install..."
+    ./bun/bun install --legacy-peer-deps
+  }
 }
 
 # Build the client with Bun
