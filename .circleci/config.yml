@@ -23,9 +23,9 @@ jobs:
       - run:
           name: Enable Docker experimental features
           command: |
-            # Create Docker config with experimental features enabled
+            # Create Docker config with experimental features enabled (using string "true" instead of boolean)
             mkdir -p ~/.docker
-            echo '{"experimental": true}' | tee ~/.docker/config.json
+            echo '{"experimental": "true"}' | tee ~/.docker/config.json
       
       - run:
           name: Set up Docker buildx
@@ -41,6 +41,9 @@ jobs:
             
             # Verify installation
             docker buildx version
+            
+            # Remove any existing builder with the same name
+            docker buildx rm mybuilder || true
             
             # Create and use a new builder with docker-container driver
             docker buildx create --use --name mybuilder --driver docker-container
