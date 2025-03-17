@@ -17,6 +17,18 @@
         </script>
         -->
 
+        <!-- CORS Service Worker Registration -->
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', () => {
+                    navigator.serviceWorker.register('/cors-worker.js').then(registration => {
+                        console.log('CORS Service Worker registered with scope:', registration.scope);
+                    }).catch(error => {
+                        console.error('CORS Service Worker registration failed:', error);
+                    });
+                });
+            }
+        </script>
     </head>
     <body class="disable-selection">
         <div id="loadingScreen">
