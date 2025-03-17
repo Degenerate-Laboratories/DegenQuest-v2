@@ -11,19 +11,9 @@ export class Network {
 
     constructor(port = 3000) {
         try {
-            // Use appropriate WebSocket URL based on environment
-            let url;
-            let httpBase;
-            
-            if (isLocal()) {
-                url = "ws://localhost:" + port;
-                httpBase = "http://localhost:" + port;
-            } else {
-                // Use port 80 for the production server (standard HTTP port)
-                // Using the new service IP with session affinity
-                url = "ws://134.199.184.144:80";
-                httpBase = "http://134.199.184.144:80";
-            }
+            // Always use production server for testing
+            const url = "ws://134.199.184.144:80";
+            const httpBase = "http://134.199.184.144:80";
             
             this.serverUrl = url;
             this.httpUrl = httpBase;
