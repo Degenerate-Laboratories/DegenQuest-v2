@@ -93,7 +93,8 @@ workflows:
             branches:
               only: 
                 - master
-                - feature/bun-migration 
+                - feature/bun-migration
+                - local-works
       - restart-deployment:
           requires:
             - build-and-push
@@ -101,4 +102,5 @@ workflows:
             branches:
               only: 
                 - master
-                - feature/bun-migration 
+                - feature/bun-migration
+                - local-works 
