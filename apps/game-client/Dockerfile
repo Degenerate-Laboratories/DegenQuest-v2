@@ -27,9 +27,8 @@ COPY ./apps/game-client/ ./
 # Create data directory
 RUN mkdir -p /data && chmod 777 /data
 
-# Copy the database file to the data directory
-COPY ./apps/game-client/database.db /data/
-RUN chmod 666 /data/database.db
+# Create an empty database file instead of copying one
+RUN touch /data/database.db && chmod 666 /data/database.db
 
 # Expose port 8888
 EXPOSE 8888
