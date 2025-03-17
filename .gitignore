@@ -21,7 +21,10 @@ node_modules/
 # Production
 /build
 /dist
-**/build/
+# Allow the client dist directory for deployment 
+!apps/game-client/dist/
+!apps/game-client/dist/**/*
+# Keep ignoring other dist directories
 **/dist/
 
 # Misc
