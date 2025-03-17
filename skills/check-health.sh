@@ -51,7 +51,6 @@ check_endpoint() {
     
     # Check HTTP status code
     if [ "$http_code" -eq 200 ]; then
-        # Always fetch version for healthy endpoints
         # Check if response is valid JSON before parsing
         if echo "$response" | jq empty 2>/dev/null; then
             local version=$(echo "$response" | jq -r '.version // "unknown"')
@@ -76,9 +75,15 @@ check_endpoint() {
                 fi
             fi
         else
-            echo -e "${GREEN}✓ $name is healthy (HTTP $http_code)${NC} - ${YELLOW}Non-JSON response received${NC}"
-            if [ "$VERBOSE" = true ]; then
-                echo -e "  ${YELLOW}Response: ${response:0:100}...${NC}"
+            # Check if it's HTML
+            if [[ "$response" == *"<!DOCTYPE html>"* || "$response" == *"<html"* ]]; then
+                echo -e "${YELLOW}⚠ $name returned HTML instead of JSON (HTTP $http_code)${NC}"
+                echo -e "${YELLOW}  This endpoint may be misconfigured or returning the client app instead of health data${NC}"
+            else
+                echo -e "${GREEN}✓ $name is healthy (HTTP $http_code)${NC} - ${YELLOW}Non-JSON response received${NC}"
+                if [ "$VERBOSE" = true ]; then
+                    echo -e "  ${YELLOW}Response preview: ${response:0:50}...${NC}"
+                fi
             fi
         fi
     else

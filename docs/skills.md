@@ -70,6 +70,7 @@ cd skills
 - Shows HTTP status code for each endpoint
 - For healthy endpoints (HTTP 200), displays the version number automatically
 - Color-coded output for easy status identification
+- Smart response type detection - warns if an endpoint returns HTML instead of JSON
 
 **Parameters**:
 - `--verbose`: Shows detailed health information including environment, uptime, database status, and size
@@ -80,7 +81,8 @@ Checking Localhost health...
 ✗ Localhost is not healthy (HTTP 000)
 
 Checking Docker Container health...
-✓ Docker Container is healthy (HTTP 200) - Version: 0.4.1
+⚠ Docker Container returned HTML instead of JSON (HTTP 200)
+  This endpoint may be misconfigured or returning the client app instead of health data
 
 Checking Development Server health...
 ✓ Development Server is healthy (HTTP 200) - Version: 0.4.1
