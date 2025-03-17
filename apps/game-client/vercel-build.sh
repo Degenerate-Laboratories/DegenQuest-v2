@@ -3,6 +3,41 @@ set -e
 
 echo "🚀 Starting optimized Bun build process for Vercel..."
 
+# Setup Python environment for node-gyp
+echo "📦 Setting up Python for node-gyp..."
+if command -v python3 &> /dev/null; then
+  echo "Python 3 is installed."
+  # Check Python version
+  PYTHON_VERSION=$(python3 --version | cut -d' ' -f2)
+  echo "Python version: $PYTHON_VERSION"
+  
+  # Install distutils if needed
+  if ! python3 -c "import distutils" &> /dev/null; then
+    echo "Installing distutils..."
+    if command -v pip3 &> /dev/null; then
+      pip3 install setuptools
+    else
+      echo "pip3 not found. Attempting to install pip..."
+      if command -v apt-get &> /dev/null; then
+        apt-get update -qq && apt-get install -qq -y python3-pip python3-setuptools
+      elif command -v yum &> /dev/null; then
+        yum install -y python3-pip python3-setuptools
+      else
+        echo "WARNING: Could not install pip. Native module builds may fail."
+      fi
+    fi
+  fi
+else
+  echo "Python 3 not found. Installing..."
+  if command -v apt-get &> /dev/null; then
+    apt-get update -qq && apt-get install -qq -y python3 python3-pip python3-setuptools
+  elif command -v yum &> /dev/null; then
+    yum install -y python3 python3-pip python3-setuptools
+  else
+    echo "WARNING: Could not install Python. Native module builds may fail."
+  fi
+fi
+
 # Check if we already have a cached Bun installation
 if [ ! -d "./bun" ]; then
   echo "📦 Installing Bun (first deployment)..."
@@ -68,6 +103,10 @@ echo "📋 Bun version:"
   echo "Failed to run Bun. Check installation."
   exit 1
 }
+
+# Set environment variables for node-gyp
+echo "Setting NODE_GYP_FORCE_PYTHON to python3"
+export NODE_GYP_FORCE_PYTHON="$(which python3)"
 
 # Install dependencies with Bun
 echo "📚 Installing dependencies with Bun..."
