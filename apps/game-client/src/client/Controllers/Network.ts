@@ -1,6 +1,6 @@
 // colyseus
 import { Client, Room } from "colyseus.js";
-import { isLocal } from "../Utils";
+import { isLocal, wsUrl, apiUrl, getServerUrl } from "../Utils";
 import { ServerMsg } from "../../shared/types";
 
 export class Network {
@@ -13,15 +13,11 @@ export class Network {
 
     constructor(port = 80, serverUrl: string | null = null) {
         try {
-            // Use provided serverUrl or default to production server
-            const url = serverUrl || "ws://134.199.184.18:80";
+            // Use provided serverUrl or get from utility functions
+            const url = serverUrl || wsUrl(port);
             
-            // Extract host and port from the URL for http endpoint
-            const urlParts = url.replace('ws://', '').split(':');
-            const host = urlParts[0];
-            const wsPort = urlParts.length > 1 ? urlParts[1] : '80';
-            
-            const httpBase = `http://${host}:${wsPort}`;
+            // Get HTTP endpoint
+            const httpBase = apiUrl(port);
             
             this.serverUrl = url;
             this.httpUrl = httpBase;
