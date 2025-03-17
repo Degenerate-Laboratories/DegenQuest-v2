@@ -27,7 +27,10 @@
             </div>
         </div>
         <canvas id="renderCanvas"></canvas>
-        <script rel="dns-prefetch" src="/lib/pep.js"></script>
-        <script type="module" src="/src/client/index.ts"></script>
+        <script src="/lib/pep.js"></script>
+        <!-- Use a regular script tag to load the main entry point through Vite's client -->
+        <script type="module">
+            import '/src/client/index.ts';
+        </script>
     </body>
 </html>

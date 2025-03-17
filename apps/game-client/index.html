@@ -39,7 +39,10 @@
             </div>
         </div>
         <canvas id="renderCanvas"></canvas>
-        <script rel="dns-prefetch" src="/lib/pep.js" crossorigin="anonymous"></script>
-        <script type="module" src="/src/client/index.ts" crossorigin="anonymous"></script>
+        <script src="/lib/pep.js" crossorigin="anonymous"></script>
+        <!-- Use inline module import -->
+        <script type="module">
+            import '/src/client/index.ts';
+        </script>
     </body>
 </html> 

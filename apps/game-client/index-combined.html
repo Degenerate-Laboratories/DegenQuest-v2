@@ -58,26 +58,31 @@
         <!-- Load either the old bundle approach or the new module approach -->
         <script>
             // Try to load the main bundle first (old approach)
-            const mainScript = document.createElement('script');
-            mainScript.src = '/js/bundle.js';
-            mainScript.crossOrigin = 'anonymous';
-            mainScript.onerror = function() {
-                console.log('Bundle script not found, trying module approach');
-                // If that fails, try the module approach (new Vite approach)
-                const moduleScript = document.createElement('script');
-                moduleScript.type = 'module';
-                moduleScript.src = '/src/client/index.ts';
-                moduleScript.crossOrigin = 'anonymous';
-                document.body.appendChild(moduleScript);
+            try {
+                const mainScript = document.createElement('script');
+                mainScript.src = '/js/bundle.js';
+                mainScript.crossOrigin = 'anonymous';
+                document.body.appendChild(mainScript);
                 
-                // Also load pep.js for the module approach
-                const pepScript = document.createElement('script');
-                pepScript.rel = 'dns-prefetch';
-                pepScript.src = '/lib/pep.js';
-                pepScript.crossOrigin = 'anonymous';
-                document.body.appendChild(pepScript);
-            };
-            document.body.appendChild(mainScript);
+                // Add error handler after appending to catch load errors
+                mainScript.onerror = function() {
+                    console.log('Bundle script not found, trying module approach');
+                    
+                    // Load pep.js first
+                    const pepScript = document.createElement('script');
+                    pepScript.src = '/lib/pep.js';
+                    pepScript.crossOrigin = 'anonymous';
+                    document.body.appendChild(pepScript);
+                    
+                    // Then use inline module import
+                    const moduleScript = document.createElement('script');
+                    moduleScript.type = 'module';
+                    moduleScript.textContent = 'import "/src/client/index.ts";';
+                    document.body.appendChild(moduleScript);
+                };
+            } catch (error) {
+                console.error('Error loading scripts:', error);
+            }
         </script>
     </body>
 </html> 
