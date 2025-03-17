@@ -21,10 +21,30 @@ jobs:
             - docker-cache-
       
       - run:
+          name: Enable Docker experimental features
+          command: |
+            # Create Docker config with experimental features enabled
+            mkdir -p ~/.docker
+            echo '{"experimental": true}' | tee ~/.docker/config.json
+      
+      - run:
           name: Set up Docker buildx
           command: |
-            docker buildx create --name mybuilder --use
-            docker buildx inspect --bootstrap
+            # Make sure we have the latest Docker version
+            docker version
+            
+            # Install latest buildx from GitHub releases
+            BUILDX_VERSION=v0.12.1
+            mkdir -p ~/.docker/cli-plugins
+            curl -sSL "https://github.com/docker/buildx/releases/download/${BUILDX_VERSION}/buildx-${BUILDX_VERSION}.linux-amd64" -o ~/.docker/cli-plugins/docker-buildx
+            chmod +x ~/.docker/cli-plugins/docker-buildx
+            
+            # Verify installation
+            docker buildx version
+            
+            # Create and use a new builder with docker-container driver
+            docker buildx create --use --name mybuilder --driver docker-container
+            docker buildx inspect --bootstrap mybuilder
       
       - run:
           name: Login to DigitalOcean Container Registry
@@ -34,8 +54,9 @@ jobs:
       - run:
           name: Build and push amd64 image (Bun-powered build)
           command: |
-            # Use buildkit's cache capabilities
-            docker buildx build \
+            # First try with buildx (for multi-platform support)
+            echo "Attempting to build with buildx..."
+            if docker buildx build \
               --platform linux/amd64 \
               -t registry.digitalocean.com/pioneer/degen-server:${CIRCLE_SHA1} \
               -t registry.digitalocean.com/pioneer/degen-server:latest \
@@ -44,7 +65,22 @@ jobs:
               --build-arg BUILDKIT_INLINE_CACHE=1 \
               --build-arg DISABLE_ESLINT_PLUGIN=true \
               --push \
-              .
+              .; then
+              echo "Buildx build successful!"
+            else
+              echo "Buildx build failed, falling back to standard Docker build..."
+              # Fallback to standard Docker build
+              docker build \
+                -t registry.digitalocean.com/pioneer/degen-server:${CIRCLE_SHA1} \
+                -t registry.digitalocean.com/pioneer/degen-server:latest \
+                -f ./apps/game-client/Dockerfile \
+                --build-arg DISABLE_ESLINT_PLUGIN=true \
+                .
+              
+              # Push the images
+              docker push registry.digitalocean.com/pioneer/degen-server:${CIRCLE_SHA1}
+              docker push registry.digitalocean.com/pioneer/degen-server:latest
+            fi
       
       # Save Docker cache
       - save_cache:
