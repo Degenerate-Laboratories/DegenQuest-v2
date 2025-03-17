@@ -51,6 +51,11 @@ next-env.d.ts
 .turbo/
 **/.turbo/
 
+# Bun
+**/bun/
+**/.npmrc
+**/bun.lockb
+
 # Game specific
 database.db
 *.log 
