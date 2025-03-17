@@ -7,17 +7,31 @@ export class Network {
     public _client: Client;
     public connectionSuccessful: boolean = false;
     public serverUrl: string = "";
+    public httpUrl: string = "";
 
     constructor(port = 3000) {
         try {
             // Use appropriate WebSocket URL based on environment
             let url;
-            url = "ws://134.199.184.18:" + port;
+            let httpBase;
+            
+            if (isLocal()) {
+                url = "ws://localhost:" + port;
+                httpBase = "http://localhost:" + port;
+            } else {
+                // Use port 80 for the production server (standard HTTP port)
+                // Using the new service IP with session affinity
+                url = "ws://134.199.184.144:80";
+                httpBase = "http://134.199.184.144:80";
+            }
+            
             this.serverUrl = url;
+            this.httpUrl = httpBase;
             
             console.log("%c[Network] Connecting to game server: " + url, "color: green; font-weight: bold");
+            console.log("%c[Network] HTTP endpoint: " + httpBase, "color: green; font-weight: bold");
             
-            // Add WebSocket debugging
+            // Configure client with both endpoints
             this._client = new Client(url);
             
             // Enable debug logging
