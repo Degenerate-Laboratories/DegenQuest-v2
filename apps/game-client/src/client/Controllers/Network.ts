@@ -10,8 +10,13 @@ export class Network {
 
     constructor(port = 3000) {
         try {
-            // Use localhost WebSocket URL
-            const url = "ws://localhost:" + port;
+            // Use appropriate WebSocket URL based on environment
+            let url;
+            if (isLocal()) {
+                url = "ws://localhost:" + port;
+            } else {
+                url = "ws://134.199.184.18:" + port;
+            }
             this.serverUrl = url;
             
             console.log("%c[Network] Connecting to game server: " + url, "color: green; font-weight: bold");
