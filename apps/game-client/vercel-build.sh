@@ -1,52 +1,33 @@
 #!/bin/bash
 set -e
 
-echo "=== DEBUGGING INFO ==="
-echo "Node version: $(node -v)"
-echo "NPM version: $(npm -v)"
-echo "Current directory: $(pwd)"
-echo "Directory contents:"
-ls -la
+echo "🚀 Starting optimized Bun build process for Vercel..."
 
-# Copy our simplified package.json to avoid pnpm issues
-echo "=== SETUP PACKAGE.JSON ==="
-cp vercel-package.json package.json
-
-# Copy production env variables
-echo "=== SETUP ENV VARIABLES ==="
-cp .env.production .env
-cat .env
-
-# Install dependencies
-echo "=== INSTALLING DEPENDENCIES ==="
-npm install --no-package-lock --force
-
-# Show environment before building
-echo "=== ENVIRONMENT VARIABLES ==="
-# Important: This reveals env vars, but only build-time ones
-env | grep -v "TOKEN\|SECRET\|PASSWORD\|KEY" | sort
-
-# Run the client build with timeout to prevent Vercel from killing the build
-echo "=== BUILDING CLIENT (TIMEOUT: 5m) ==="
-npm run client-build || {
-  echo "Build failed! Error code: $?"
-  echo "Webpack may have stalled - check dependencies and configuration"
-  exit 1
-}
-
-# Create the output directory if it doesn't exist
-echo "=== CREATING OUTPUT DIRECTORY ==="
-mkdir -p dist/client
-
-# Copy necessary files if they don't exist
-echo "=== CHECKING BUILD OUTPUT ==="
-if [ ! -f "dist/client/index.html" ]; then
-  echo "ERROR: dist/client/index.html not found. Build failed!"
-  # Try to recover by copying public files
-  echo "Attempting recovery by copying public files..."
-  cp -r public/* dist/client/ || true
+# Check if we already have a cached Bun installation
+if [ ! -d "./bun" ]; then
+  echo "📦 Installing Bun (first deployment)..."
+  # Create a directory to install Bun into
+  mkdir -p ./bun
+  # Download and install Bun to the project directory for caching
+  curl -fsSL https://bun.sh/install | bash -s -- --install-dir ./bun
+  echo "✅ Bun installed successfully!"
+else
+  echo "♻️ Using cached Bun installation"
 fi
 
-# Show output directory contents for debugging
-echo "=== BUILD OUTPUT ==="
-ls -la dist/client 
+# Make sure Bun is executable
+chmod +x ./bun/bin/bun
+
+# Echo Bun version for logs
+echo "📋 Bun version:"
+./bun/bin/bun --version
+
+# Install dependencies with Bun
+echo "📚 Installing dependencies with Bun..."
+./bun/bin/bun install
+
+# Build the client with Bun
+echo "🔨 Building the client with Bun..."
+./bun/bin/bun run vite build
+
+echo "✅ Build completed successfully!" 
