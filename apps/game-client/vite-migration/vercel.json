@@ -23,6 +23,18 @@
         {
           "key": "Cross-Origin-Embedder-Policy",
           "value": "unsafe-none"
+        },
+        {
+          "key": "Cross-Origin-Resource-Policy",
+          "value": "cross-origin"
+        },
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://vercel.live https://vercel.com; connect-src 'self' https://vercel.live https://vercel.com; img-src 'self' data: https://vercel.live https://vercel.com; style-src 'self' 'unsafe-inline'; font-src 'self'; frame-src 'self' https://vercel.live https://vercel.com;"
+        },
+        {
+          "key": "Permissions-Policy",
+          "value": "interest-cohort=()"
         }
       ]
     },
@@ -32,6 +44,15 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=31536000, immutable"
+        }
+      ]
+    },
+    {
+      "source": "/debug-headers.html",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-store, max-age=0"
         }
       ]
     }
