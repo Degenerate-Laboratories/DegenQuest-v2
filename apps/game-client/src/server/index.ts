@@ -2,6 +2,7 @@
 import { createServer } from "http";
 import express from "express";
 import cors from "cors";
+import path from "path";
 
 import { Server, matchMaker } from "@colyseus/core";
 import { monitor } from "@colyseus/monitor";
@@ -19,6 +20,10 @@ import Logger from "./utils/Logger";
 import { Config } from "../shared/Config";
 
 import "dotenv/config";
+
+// Import health endpoint
+// @ts-ignore - This is a JS file we're importing into TS
+const { initHealthEndpoint } = require('./health');
 
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
@@ -46,6 +51,12 @@ class GameServer {
         const port = this.config.port;
         const app = express();
         app.use(cors());
+
+        // Register health endpoint
+        initHealthEndpoint(app, {
+            dbSchemaVersion: '1.0', // Hardcoded for now until we implement schema versioning
+            e2eTestStatus: process.env.E2E_TESTS_PASS || 'not_run'
+        });
 
         // create colyseus server
         const gameServer = new Server({
@@ -88,9 +99,34 @@ class GameServer {
         //////////////////////////////////////////////////
         //// SERVING CLIENT DIST FOLDER TO EXPRESS ///////
         /////////////////////////////////////////////////
+        
+        // Setup static file serving for client
+        const clientPath = path.resolve(__dirname, "../../dist/client");
+        app.use(express.static(clientPath));
+        Logger.info(`[gameserver] serving client files from ${clientPath}`);
+        
+        // Catch-all route to serve index.html for client-side routing
+        app.get('*', (req, res, next) => {
+            // Skip API routes
+            if (req.path.startsWith('/api') || 
+                req.path.startsWith('/colyseus') || 
+                req.path.startsWith('/health')) {
+                return next();
+            }
+            
+            res.sendFile(path.join(clientPath, 'index.html'));
+        });
 
+        //////////////////////////////////////////////////
+        ///////////// API SERVER ////////////////////////
+        //////////////////////////////////////////////////
+        // start api
         this.api = new Api(app, this.database);
     }
 }
 
-new GameServer();
+// start the gameserver
+const gameServer = new GameServer();
+
+// export variables for testing
+export { gameServer };

@@ -66,10 +66,11 @@ cd skills
 ```
 
 **Features**:
-- Checks health of four endpoints: localhost, docker container, development server, and production server
+- Checks health of four server environments: localhost, docker container, development server, and production server
 - Shows HTTP status code for each endpoint
 - Reads local package.json version and compares with server reported versions
 - For healthy endpoints (HTTP 200), displays the version number with match/mismatch indicator
+- Falls back to alternative endpoints (/api/health, /version) if main endpoint returns HTML instead of JSON
 - Color-coded output for easy status identification
 - Smart response type detection - warns if an endpoint returns HTML instead of JSON
 
@@ -86,6 +87,8 @@ Checking Localhost health...
 Checking Docker Container health...
 ⚠ Docker Container returned HTML instead of JSON (HTTP 200)
   This endpoint may be misconfigured or returning the client app instead of health data
+  Trying alternative endpoints...
+  ✓ Docker Container API - Version: 0.4.1 ✓
 
 Checking Development Server health...
 ✓ Development Server is healthy (HTTP 200) - Version: 0.4.1 ✓
@@ -99,19 +102,25 @@ Run with --verbose for detailed information
 Use get-status.sh for more comprehensive status information
 ```
 
-**Endpoints Checked**:
-1. Localhost (non-Docker): `http://localhost:8888/health`
-2. Docker Container: `http://localhost:3002/health`
-3. Development Server: `http://134.199.184.18:8888/health`
-4. Production Server: `http://134.199.184.18/health`
+**Endpoints Checked** (per server):
+1. Main health endpoint: `/health`
+2. API health endpoint: `/api/health`
+3. Version endpoint: `/version`
+
+**Servers Checked**:
+1. Localhost (non-Docker): `http://localhost:8888/...`
+2. Docker Container: `http://localhost:3002/...`
+3. Development Server: `http://134.199.184.18:8888/...`
+4. Production Server: `http://134.199.184.18/...`
 
 **Output**:
 - Basic HTTP status for each endpoint
+- Version information with visual indicators for matching/mismatching versions
 - Detailed version, environment, uptime, and database info when using `--verbose`
 - Color-coded results for easy reading
 
 **When to use**:
-- During deployments to verify all instances are healthy
+- During deployments to verify all instances are healthy and running the correct version
 - As a quick check during incidents
 - For regular monitoring
 

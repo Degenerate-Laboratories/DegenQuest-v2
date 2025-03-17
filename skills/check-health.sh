@@ -20,9 +20,20 @@ fi
 
 # Default endpoints
 LOCALHOST_URL="http://localhost:8888/health"
+LOCALHOST_API_URL="http://localhost:8888/api/health"
+LOCALHOST_VERSION_URL="http://localhost:8888/version"
+
 DOCKER_URL="http://localhost:3002/health"
+DOCKER_API_URL="http://localhost:3002/api/health"
+DOCKER_VERSION_URL="http://localhost:3002/version"
+
 DEVELOP_URL="http://134.199.184.18:8888/health"
+DEVELOP_API_URL="http://134.199.184.18:8888/api/health"
+DEVELOP_VERSION_URL="http://134.199.184.18:8888/version"
+
 PRODUCTION_URL="http://134.199.184.18/health"
+PRODUCTION_API_URL="http://134.199.184.18/api/health"
+PRODUCTION_VERSION_URL="http://134.199.184.18/version"
 
 # Get current version from package.json for comparison
 PKG_PATH="../apps/game-client/package.json"
@@ -45,7 +56,11 @@ fi
 check_endpoint() {
     local name="$1"
     local url="$2"
-    echo -e "${BLUE}Checking $name health...${NC}"
+    local is_alt_endpoint="${3:-false}"
+    
+    if [ "$is_alt_endpoint" = false ]; then
+        echo -e "${BLUE}Checking $name health...${NC}"
+    fi
     
     # Make the request
     local response
@@ -70,15 +85,28 @@ check_endpoint() {
             # Add version match indicator
             if [ -z "$version" ] || [ "$version" = "null" ]; then
                 # Handle empty or null version
-                echo -e "${GREEN}✓ $name is healthy (HTTP $http_code)${NC} - ${YELLOW}No version reported${NC}"
+                if [ "$is_alt_endpoint" = false ]; then
+                    echo -e "${GREEN}✓ $name is healthy (HTTP $http_code)${NC} - ${YELLOW}No version reported${NC}"
+                fi
+                FOUND_VERSION=false
             elif [ "$version" = "$LOCAL_VERSION" ]; then
-                echo -e "${GREEN}✓ $name is healthy (HTTP $http_code) - Version: ${YELLOW}$version${NC} ${GREEN}✓${NC}"
+                if [ "$is_alt_endpoint" = false ]; then
+                    echo -e "${GREEN}✓ $name is healthy (HTTP $http_code) - Version: ${YELLOW}$version${NC} ${GREEN}✓${NC}"
+                else
+                    echo -e "  ${GREEN}✓ $name${NC} - Version: ${YELLOW}$version${NC} ${GREEN}✓${NC}"
+                fi
+                FOUND_VERSION=true
             else
-                echo -e "${GREEN}✓ $name is healthy (HTTP $http_code) - Version: ${YELLOW}$version${NC} ${RED}≠ $LOCAL_VERSION${NC}"
+                if [ "$is_alt_endpoint" = false ]; then
+                    echo -e "${GREEN}✓ $name is healthy (HTTP $http_code) - Version: ${YELLOW}$version${NC} ${RED}≠ $LOCAL_VERSION${NC}"
+                else
+                    echo -e "  ${GREEN}✓ $name${NC} - Version: ${YELLOW}$version${NC} ${RED}≠ $LOCAL_VERSION${NC}"
+                fi
+                FOUND_VERSION=true
             fi
             
             # Parse and display additional info in verbose mode
-            if [ "$VERBOSE" = true ]; then
+            if [ "$VERBOSE" = true ] && [ "$is_alt_endpoint" = false ]; then
                 local env=$(echo "$response" | jq -r '.environment // "unknown"')
                 local uptime=$(echo "$response" | jq -r '.system.uptime // "unknown"')
                 local db_status=$(echo "$response" | jq -r '.database.exists // "unknown"')
@@ -95,29 +123,70 @@ check_endpoint() {
                     echo -e "${RED}  Error: $error${NC}"
                 fi
             fi
+            
+            # Return success if version was found
+            return $([ "$FOUND_VERSION" = true ] && echo 0 || echo 1)
         else
             # Check if it's HTML
             if [[ "$response" == *"<!DOCTYPE html>"* || "$response" == *"<html"* ]]; then
-                echo -e "${YELLOW}⚠ $name returned HTML instead of JSON (HTTP $http_code)${NC}"
-                echo -e "${YELLOW}  This endpoint may be misconfigured or returning the client app instead of health data${NC}"
-            else
-                echo -e "${GREEN}✓ $name is healthy (HTTP $http_code)${NC} - ${YELLOW}Non-JSON response received${NC}"
-                if [ "$VERBOSE" = true ]; then
-                    echo -e "  ${YELLOW}Response preview: ${response:0:50}...${NC}"
+                if [ "$is_alt_endpoint" = false ]; then
+                    echo -e "${YELLOW}⚠ $name returned HTML instead of JSON (HTTP $http_code)${NC}"
+                    echo -e "${YELLOW}  This endpoint may be misconfigured or returning the client app instead of health data${NC}"
+                    echo -e "${YELLOW}  Trying alternative endpoints...${NC}"
                 fi
+                return 1
+            else
+                if [ "$is_alt_endpoint" = false ]; then
+                    echo -e "${GREEN}✓ $name is healthy (HTTP $http_code)${NC} - ${YELLOW}Non-JSON response received${NC}"
+                    if [ "$VERBOSE" = true ]; then
+                        echo -e "  ${YELLOW}Response preview: ${response:0:50}...${NC}"
+                    fi
+                fi
+                return 1
             fi
         fi
     else
-        echo -e "${RED}✗ $name is not healthy (HTTP $http_code)${NC}"
+        if [ "$is_alt_endpoint" = false ]; then
+            echo -e "${RED}✗ $name is not healthy (HTTP $http_code)${NC}"
+        fi
+        return 1
     fi
+}
+
+# Function to check all possible endpoints for a server
+check_server() {
+    local name="$1"
+    local main_url="$2"
+    local api_url="$3"
+    local version_url="$4"
+    
+    # Try main health endpoint first
+    if check_endpoint "$name" "$main_url" false; then
+        echo ""
+        return 0
+    fi
+    
+    # If main endpoint fails, try API endpoint
+    if check_endpoint "$name API" "$api_url" true; then
+        echo ""
+        return 0
+    fi
+    
+    # If API endpoint fails, try version endpoint
+    if check_endpoint "$name Version" "$version_url" true; then
+        echo ""
+        return 0
+    fi
+    
     echo ""
+    return 1
 }
 
 # Check all endpoints
-check_endpoint "Localhost" "$LOCALHOST_URL"
-check_endpoint "Docker Container" "$DOCKER_URL"
-check_endpoint "Development Server" "$DEVELOP_URL"
-check_endpoint "Production Server" "$PRODUCTION_URL"
+check_server "Localhost" "$LOCALHOST_URL" "$LOCALHOST_API_URL" "$LOCALHOST_VERSION_URL"
+check_server "Docker Container" "$DOCKER_URL" "$DOCKER_API_URL" "$DOCKER_VERSION_URL"
+check_server "Development Server" "$DEVELOP_URL" "$DEVELOP_API_URL" "$DEVELOP_VERSION_URL"
+check_server "Production Server" "$PRODUCTION_URL" "$PRODUCTION_API_URL" "$PRODUCTION_VERSION_URL"
 
 # Summary
 echo -e "${BLUE}Health Check Summary${NC}"
