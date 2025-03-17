@@ -15,11 +15,11 @@
         "server-start": "bun src/server/index.ts",
         "server-build": "tsc && cp -r public dist",
         "loadtest": "npx tsx loadtest/test.ts --room game_room --numClients 10 --endpoint ws://localhost:3000",
-        "docker:build": "docker build -t degen-server -f Dockerfile ../../",
-        "docker:tag": "docker tag degen-server:latest registry.digitalocean.com/pioneer/degen-server:latest",
-        "docker:run": "docker run --env-file=../../.env degen-server:latest",
-        "docker:push": "docker push registry.digitalocean.com/pioneer/degen-server:latest",
-        "docker:push:all": "npm run docker:build && npm run docker:tag && npm run docker:push"
+        "docker:build": "docker build -t degen-server:dev -f Dockerfile ../../ # DEV ONLY - Production builds should be handled by CircleCI",
+        "docker:tag": "docker tag degen-server:dev registry.digitalocean.com/pioneer/degen-server:dev # DEV ONLY - Not for production use",
+        "docker:run": "docker run --env-file=../../.env degen-server:dev # For local testing only",
+        "docker:push": "echo 'DEPRECATED: Production Docker images should only be built and pushed by CircleCI'",
+        "docker:push:all": "echo 'DEPRECATED: Production Docker images should only be built and pushed by CircleCI'"
     },
     "author": "Orion3d",
     "license": "MIT",

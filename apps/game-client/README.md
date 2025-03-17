@@ -52,16 +52,29 @@ Check out my devlogs on [https://dev.to/orion3d](https://dev.to/orion3d)
 
 > The Colyseus playground should be available at [http://localhost:3000/playground](http://localhost:3000/playground)
 
-## Running with Docker (for Apple Silicon M1/M2 Macs)
+## Running with Docker (for Local Development Only)
+
+> **IMPORTANT**: Docker builds should only be used for local development and testing. Production Docker images should always be built by CircleCI jobs to ensure consistency and security.
+
 If you're running on Apple Silicon, you may encounter "invalid ELF header" errors with SQLite. To solve this:
 
 ```bash
-# Build the Docker image
-docker build -t degen-server-local .
+# Build the Docker image for local development only
+docker build -t degen-server-dev .
 
 # Run the Docker container with volume mounted database
-docker run -p 8888:8888 --env-file=.env --volume ./database.db:/app/database.db degen-server-local
+docker run -p 8888:8888 --env-file=.env --volume ./database.db:/app/database.db degen-server-dev
 ```
+
+## Deployment Process
+
+For production deployments:
+
+1. Bump the version number using the version script
+2. Commit and push changes to the master branch
+3. CircleCI will automatically build and deploy the new version
+
+Never manually build and push Docker images for production. This should always be handled by the CI/CD pipeline.
 
 Then update your .env file to point to the Docker server:
 ```
