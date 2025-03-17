@@ -65,8 +65,26 @@ cd skills
 ./check-health.sh [--verbose]
 ```
 
+**Features**:
+- Checks health of four endpoints: localhost, docker container, development server, and production server
+- Shows HTTP status code for each endpoint
+- For healthy endpoints (HTTP 200), displays the version number automatically
+- Color-coded output for easy status identification
+
 **Parameters**:
-- `--verbose`: Shows detailed health information for each endpoint
+- `--verbose`: Shows detailed health information including environment, uptime, database status, and size
+
+**Example Output**:
+```
+Checking Localhost health...
+✗ Localhost is not healthy (HTTP 000)
+
+Checking Docker Container health...
+✓ Docker Container is healthy (HTTP 200) - Version: 0.4.1
+
+Checking Development Server health...
+✓ Development Server is healthy (HTTP 200) - Version: 0.4.1
+```
 
 **Endpoints Checked**:
 1. Localhost (non-Docker): `http://localhost:8888/health`

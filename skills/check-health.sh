@@ -51,26 +51,34 @@ check_endpoint() {
     
     # Check HTTP status code
     if [ "$http_code" -eq 200 ]; then
-        echo -e "${GREEN}✓ $name is healthy (HTTP $http_code)${NC}"
-        
-        # Parse and display version info
-        if [ "$VERBOSE" = true ]; then
+        # Always fetch version for healthy endpoints
+        # Check if response is valid JSON before parsing
+        if echo "$response" | jq empty 2>/dev/null; then
             local version=$(echo "$response" | jq -r '.version // "unknown"')
-            local env=$(echo "$response" | jq -r '.environment // "unknown"')
-            local uptime=$(echo "$response" | jq -r '.system.uptime // "unknown"')
-            local db_status=$(echo "$response" | jq -r '.database.exists // "unknown"')
-            local db_size=$(echo "$response" | jq -r '.database.size // "unknown"')
+            echo -e "${GREEN}✓ $name is healthy (HTTP $http_code) - Version: ${YELLOW}$version${NC}"
             
-            echo -e "  Version:     ${YELLOW}$version${NC}"
-            echo -e "  Environment: ${YELLOW}$env${NC}"
-            echo -e "  Uptime:      ${YELLOW}$uptime seconds${NC}"
-            echo -e "  DB Status:   ${YELLOW}$db_status${NC}"
-            echo -e "  DB Size:     ${YELLOW}$db_size bytes${NC}"
-            
-            # If there's any error message, display it
-            local error=$(echo "$response" | jq -r '.error // "null"')
-            if [ "$error" != "null" ]; then
-                echo -e "${RED}  Error: $error${NC}"
+            # Parse and display additional info in verbose mode
+            if [ "$VERBOSE" = true ]; then
+                local env=$(echo "$response" | jq -r '.environment // "unknown"')
+                local uptime=$(echo "$response" | jq -r '.system.uptime // "unknown"')
+                local db_status=$(echo "$response" | jq -r '.database.exists // "unknown"')
+                local db_size=$(echo "$response" | jq -r '.database.size // "unknown"')
+                
+                echo -e "  Environment: ${YELLOW}$env${NC}"
+                echo -e "  Uptime:      ${YELLOW}$uptime seconds${NC}"
+                echo -e "  DB Status:   ${YELLOW}$db_status${NC}"
+                echo -e "  DB Size:     ${YELLOW}$db_size bytes${NC}"
+                
+                # If there's any error message, display it
+                local error=$(echo "$response" | jq -r '.error // "null"')
+                if [ "$error" != "null" ]; then
+                    echo -e "${RED}  Error: $error${NC}"
+                fi
+            fi
+        else
+            echo -e "${GREEN}✓ $name is healthy (HTTP $http_code)${NC} - ${YELLOW}Non-JSON response received${NC}"
+            if [ "$VERBOSE" = true ]; then
+                echo -e "  ${YELLOW}Response: ${response:0:100}...${NC}"
             fi
         fi
     else
