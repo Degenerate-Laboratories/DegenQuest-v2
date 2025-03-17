@@ -56,9 +56,24 @@ if [ ! -d "./bun" ]; then
     fi
   fi
   
-  # Download Bun directly with a specific version (using 1.0.25 as an example)
+  # Detect platform
   BUN_VERSION="1.0.25"
-  BUN_URL="https://github.com/oven-sh/bun/releases/download/bun-v${BUN_VERSION}/bun-linux-x64.zip"
+  PLATFORM="linux-x64"
+  
+  # Check if we're on macOS
+  if [[ "$(uname)" == "Darwin" ]]; then
+    echo "Detected macOS platform"
+    PLATFORM="darwin-x64"
+    
+    # Check for Apple Silicon
+    if [[ "$(uname -m)" == "arm64" ]]; then
+      echo "Detected Apple Silicon"
+      PLATFORM="darwin-aarch64"
+    fi
+  fi
+  
+  echo "Using platform: ${PLATFORM}"
+  BUN_URL="https://github.com/oven-sh/bun/releases/download/bun-v${BUN_VERSION}/bun-${PLATFORM}.zip"
   
   echo "Downloading Bun from: ${BUN_URL}"
   curl -fsSL ${BUN_URL} -o bun.zip || {
@@ -75,12 +90,22 @@ if [ ! -d "./bun" ]; then
     exit 1
   }
   
-  # Move contents from the extraction directory to our bun directory
-  mv ./bun_temp/bun-linux-x64/* ./bun/ || {
-    echo "Failed to move Bun files. Checking directories..."
-    ls -la ./bun_temp
-    exit 1
-  }
+  # Move contents based on platform
+  if [[ "$(uname)" == "Darwin" ]]; then
+    echo "Moving files for macOS..."
+    mv ./bun_temp/bun-${PLATFORM}/* ./bun/ || {
+      echo "Failed to move Bun files. Checking directories..."
+      ls -la ./bun_temp
+      exit 1
+    }
+  else
+    echo "Moving files for Linux..."
+    mv ./bun_temp/bun-${PLATFORM}/* ./bun/ || {
+      echo "Failed to move Bun files. Checking directories..."
+      ls -la ./bun_temp
+      exit 1
+    }
+  fi
   
   # Clean up
   rm -rf ./bun_temp bun.zip
@@ -90,8 +115,11 @@ else
   echo "♻️ Using cached Bun installation"
 fi
 
+# Detect platform for correct executable name
+BUN_EXECUTABLE="./bun/bun"
+
 # Make sure Bun is executable
-chmod +x ./bun/bun || {
+chmod +x ${BUN_EXECUTABLE} || {
   echo "Failed to make Bun executable. Checking directory structure:"
   find ./bun -type f -name "bun" -o -name "bun*"
   exit 1
@@ -99,7 +127,7 @@ chmod +x ./bun/bun || {
 
 # Echo Bun version for logs
 echo "📋 Bun version:"
-./bun/bun --version || {
+${BUN_EXECUTABLE} --version || {
   echo "Failed to run Bun. Check installation."
   exit 1
 }
@@ -132,17 +160,17 @@ EOL
 
 # Install only production dependencies to reduce compilation issues
 echo "📚 Installing dependencies with Bun (production only)..."
-./bun/bun install --production || {
+${BUN_EXECUTABLE} install --production || {
   echo "Production install failed, trying with legacy-peer-deps..."
-  ./bun/bun install --production --legacy-peer-deps || {
+  ${BUN_EXECUTABLE} install --production --legacy-peer-deps || {
     echo "Failed to install dependencies with production flag, trying full install..."
-    ./bun/bun install --legacy-peer-deps
+    ${BUN_EXECUTABLE} install --legacy-peer-deps
   }
 }
 
 # Build the client with Bun
 echo "🔨 Building the client with Bun..."
-./bun/bun run vite build || {
+${BUN_EXECUTABLE} run vite build || {
   echo "Failed to build the client."
   exit 1
 }
