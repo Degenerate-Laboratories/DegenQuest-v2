@@ -3,6 +3,13 @@
   "outputDirectory": "dist/client",
   "installCommand": "echo 'Skipping default install - using Bun instead'",
   "rewrites": [
+    { "source": "/assets/(.*)", "destination": "/assets/$1" },
+    { "source": "/(.*)\\.js", "destination": "/$1.js" },
+    { "source": "/(.*)\\.css", "destination": "/$1.css" },
+    { "source": "/(.*)\\.png", "destination": "/$1.png" },
+    { "source": "/(.*)\\.jpg", "destination": "/$1.jpg" },
+    { "source": "/(.*)\\.svg", "destination": "/$1.svg" },
+    { "source": "/(.*)\\.json", "destination": "/$1.json" },
     { "source": "/(.*)", "destination": "/index.html" }
   ],
   "headers": [
@@ -12,6 +19,15 @@
         {
           "key": "Cross-Origin-Opener-Policy",
           "value": "same-origin"
+        }
+      ]
+    },
+    {
+      "source": "/assets/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=31536000, immutable"
         }
       ]
     }
