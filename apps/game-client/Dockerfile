@@ -1,10 +1,10 @@
-# Use Node as the base image with ARM64 architecture
+# Use Node as the base image with AMD64 architecture
 FROM --platform=linux/amd64 node:18-slim
 
 # Set working directory
 WORKDIR /app
 
-# Install SQLite dependencies (combined into one RUN to reduce layers)
+# Install SQLite dependencies
 RUN apt-get update && apt-get install -y \
     sqlite3 \
     libsqlite3-dev \
@@ -14,26 +14,22 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy package files first (for better layer caching)
-COPY package.json package-lock.json ./
+# First copy just package files to leverage Docker cache
+COPY ./apps/game-client/package*.json ./
 
-# Split npm installs to leverage caching
-# Install dependencies except sqlite3 (which needs special handling)
-RUN npm ci --legacy-peer-deps --ignore-scripts --only=production && \
-    npm install @colyseus/playground@0.15.4 --legacy-peer-deps --only=production && \
+# Install dependencies
+RUN npm install --legacy-peer-deps && \
     npm install sqlite3 --build-from-source --legacy-peer-deps
 
-# Copy only necessary source files (exclude node_modules, .git, etc)
-COPY apps ./apps
-COPY config ./config
-COPY tsconfig.json ./
+# Copy the rest of the app
+COPY ./apps/game-client/ ./
 
-# Expose a high port for local testing
+# Expose port 8888
 EXPOSE 8888
 
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=8888
 
-# Start the server in development mode
+# Start the server
 CMD ["npm", "run", "server-dev"] 

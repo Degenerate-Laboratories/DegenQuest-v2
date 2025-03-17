@@ -42,6 +42,7 @@ jobs:
               -f ./apps/game-client/Dockerfile \
               --cache-from=registry.digitalocean.com/pioneer/degen-server:latest \
               --build-arg BUILDKIT_INLINE_CACHE=1 \
+              --build-arg DISABLE_ESLINT_PLUGIN=true \
               --push \
               .
       
