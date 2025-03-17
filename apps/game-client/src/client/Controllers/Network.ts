@@ -12,11 +12,12 @@ export class Network {
         try {
             // Use appropriate WebSocket URL based on environment
             let url;
-            if (isLocal()) {
-                url = "ws://localhost:" + port;
-            } else {
-                url = "ws://134.199.184.18:" + port;
-            }
+            url = "ws://134.199.184.18";
+            // if (isLocal()) {
+            //     url = "ws://localhost:" + port;
+            // } else {
+            //     url = "ws://134.199.184.18:" + port;
+            // }
             this.serverUrl = url;
             
             console.log("%c[Network] Connecting to game server: " + url, "color: green; font-weight: bold");
