@@ -10,20 +10,20 @@ import { monitor } from "@colyseus/monitor";
 // import { playground } from "@colyseus/playground";
 
 import { WebSocketTransport } from "@colyseus/ws-transport";
-import { GameRoom } from "./rooms/GameRoom";
-import { ChatRoom } from "./rooms/ChatRoom";
+import { GameRoom } from "./rooms/GameRoom.js";
+import { ChatRoom } from "./rooms/ChatRoom.js";
 
-import { Api } from "./Api";
-import { Database } from "./Database";
+import { Api } from "./Api.js";
+import { Database } from "./Database.js";
 
-import Logger from "./utils/Logger";
-import { Config } from "../shared/Config";
+import Logger from "./utils/Logger.js";
+import { Config } from "../shared/Config.js";
 
 import "dotenv/config";
 
 // Import health endpoint
 // @ts-ignore - This is a JS file we're importing into TS
-const { initHealthEndpoint } = require('./health');
+import { initHealthEndpoint } from './health.js';
 
 //////////////////////////////////////////////////
 //////////////////////////////////////////////////
@@ -58,25 +58,25 @@ class GameServer {
             e2eTestStatus: process.env.E2E_TESTS_PASS || 'not_run'
         });
 
-        // Increase the seat reservation time to prevent "seat reservation expired" errors
-        matchMaker.verifyAndSetSeatReservation = async function(sessionId, reservationId) {
+        // Custom implementation that doesn't try to modify readonly properties
+        const customVerifyAndSetSeatReservation = async function(sessionId, reservationId) {
             // Method deliberately overridden - using default behavior but with longer timeout
-            const reservation = matchMaker.reservations[reservationId];
+            const reservations = (matchMaker as any).reservations || {};
+            const reservation = reservations[reservationId];
             if (!reservation) {
                 return false;
             }
             
-            delete matchMaker.reservations[reservationId];
+            delete reservations[reservationId];
             return reservation;
         };
         
-        // Set longer reservation expiration time (defaults to 10 seconds)
-        matchMaker.gracefullyShutdown = () => {};
-        matchMaker.driver.settings.gracefullyShutdown = () => {};
+        // Apply custom implementations through type assertion
+        (matchMaker as any).verifyAndSetSeatReservation = customVerifyAndSetSeatReservation;
         
         // Double the seat reservation time from default to help with connection issues
-        if (matchMaker.driver && matchMaker.driver.settings) {
-            matchMaker.driver.settings['seatReservationTime'] = 30;
+        if (matchMaker.driver && (matchMaker.driver as any).settings) {
+            (matchMaker.driver as any).settings['seatReservationTime'] = 30;
         }
 
         // create colyseus server

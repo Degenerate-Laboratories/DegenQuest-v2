@@ -1,10 +1,13 @@
 import express from "express";
 import path from "path";
-import Logger from "./utils/Logger";
-import { generateRandomPlayerName } from "../shared/Utils";
-import { GameData } from "./GameData";
-import { Database } from "./Database";
-import { generateId } from "colyseus";
+import Logger from "./utils/Logger.js";
+import { generateRandomPlayerName } from "../shared/Utils/index.js";
+import { GameData } from "./GameData.js";
+import { Database } from "./Database.js";
+import { nanoid } from "nanoid";
+
+// Replace colyseus generateId with nanoid
+const generateId = () => nanoid();
 
 class Api {
     constructor(app, database: Database) {

@@ -1,7 +1,12 @@
-const fs = require('fs');
-const path = require('path');
-const os = require('os');
-const { execSync } = require('child_process');
+import fs from 'fs';
+import path from 'path';
+import os from 'os';
+import { execSync } from 'child_process';
+import { fileURLToPath } from 'url';
+
+// Get current file and directory info for ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Read package.json for version info
 const packageJson = JSON.parse(
@@ -13,7 +18,7 @@ const packageJson = JSON.parse(
  * @param {Express} app - Express application instance
  * @param {Object} options - Configuration options
  */
-function initHealthEndpoint(app, options = {}) {
+export function initHealthEndpoint(app, options = {}) {
   const dbPath = process.env.DATABASE_PATH || path.join(process.cwd(), 'database.db');
   
   // Main health endpoint with all details
@@ -112,6 +117,4 @@ function initHealthEndpoint(app, options = {}) {
   console.log(`Health endpoint available at /health - Version: ${packageJson.version}`);
   console.log(`Simple version endpoint at /version - Version: ${packageJson.version}`);
   console.log(`API health endpoint at /api/health - Version: ${packageJson.version}`);
-}
-
-module.exports = { initHealthEndpoint }; 
+} 
