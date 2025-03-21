@@ -12,7 +12,7 @@ app.get('/health', (req, res) => {
     message: 'Health endpoint is working!'
   });
 });
-
+//bump
 // Start server
 const server = app.listen(PORT, () => {
   console.log(`Test health server running on http://localhost:${PORT}`);
