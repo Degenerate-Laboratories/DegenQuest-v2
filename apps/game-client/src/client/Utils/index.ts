@@ -29,7 +29,7 @@ const apiUrl = function (port) {
     } else {
         // Get domain or IP from environment or defaults
         const server = getServerUrl();
-        return `http://${server}`;
+        return `https://${server}`;
     }
 };
 
@@ -40,7 +40,7 @@ const wsUrl = function (port) {
     } else {
         // Get domain or IP from environment or defaults
         const server = getServerUrl();
-        return `ws://${server}`;
+        return `wss://${server}`;
     }
 };
 
