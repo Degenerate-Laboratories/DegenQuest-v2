@@ -1,5 +1,5 @@
-# Use Node as the base image with AMD64 architecture
-FROM --platform=linux/amd64 node:18-slim
+# Use Bun runtime with AMD64 architecture
+FROM --platform=linux/amd64 oven/bun:latest
 
 # Set working directory
 WORKDIR /app
@@ -18,8 +18,7 @@ RUN apt-get update && apt-get install -y \
 COPY ./apps/game-client/package*.json ./
 
 # Install dependencies
-RUN npm install --legacy-peer-deps && \
-    npm install sqlite3 --build-from-source --legacy-peer-deps
+RUN bun install --legacy-peer-deps
 
 # Copy the rest of the app
 COPY ./apps/game-client/ ./
@@ -38,5 +37,5 @@ ENV NODE_ENV=production
 ENV PORT=8888
 ENV DB_PATH=/data/database.db
 
-# Start the server
-CMD ["npm", "run", "server-dev"] 
+# Start the server with Bun
+CMD ["bun", "run", "server-start"] 
