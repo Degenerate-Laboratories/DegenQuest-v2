@@ -15,7 +15,7 @@ const getServerUrl = function() {
     }
     
     // Default production server
-    return "api.degenquest.io";
+    return "134.199.184.182";
 };
 
 const apiUrl = function (port) {
@@ -29,7 +29,7 @@ const apiUrl = function (port) {
     } else {
         // Get domain or IP from environment or defaults
         const server = getServerUrl();
-        return `https://${server}`;
+        return `http://${server}`;
     }
 };
 
@@ -40,7 +40,7 @@ const wsUrl = function (port) {
     } else {
         // Get domain or IP from environment or defaults
         const server = getServerUrl();
-        return `wss://${server}`;
+        return `ws://${server}`;
     }
 };
 
